@@ -1,4 +1,4 @@
-name: Saorsa Foundation CI
+name: saorsa-fec CI
 
 on:
   push:
@@ -55,11 +55,12 @@ jobs:
       run: cargo test --doc --features pure-rust
     
     - name: Run examples
+      if: ${{ hashFiles('examples/*.rs') != '' }}
       run: |
+        shopt -s nullglob
         for example in examples/*.rs; do
-          if [ -f "$example" ]; then
-            cargo run --example $(basename "$example" .rs) --features=examples
-          fi
+          ex=$(basename "$example" .rs)
+          cargo run --example "$ex"
         done
 
   benchmark:
@@ -156,9 +157,4 @@ jobs:
     
     - name: Publish to crates.io
       run: |
-        # Publish in dependency order
-        cd saorsa-types && cargo publish --token ${{ secrets.CARGO_TOKEN }}
-        sleep 30  # Wait for crates.io to update
-        cd ../saorsa-fec && cargo publish --token ${{ secrets.CARGO_TOKEN }}
-        sleep 30
-        cd ../saorsa-rsps && cargo publish --token ${{ secrets.CARGO_TOKEN }}
+        cargo publish --token ${{ secrets.CARGO_TOKEN }}
