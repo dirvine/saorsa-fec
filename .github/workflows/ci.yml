@@ -156,5 +156,8 @@ jobs:
       uses: dtolnay/rust-toolchain@stable
     
     - name: Publish to crates.io
+      if: env.CARGO_TOKEN != ''
+      env:
+        CARGO_TOKEN: ${{ secrets.CARGO_TOKEN }}
       run: |
-        cargo publish --token ${{ secrets.CARGO_TOKEN }}
+        cargo publish --token "$CARGO_TOKEN"
