@@ -32,7 +32,7 @@ proptest! {
         let m = params.parity_shares as usize;
 
         // Split data into k blocks
-        let block_size = (data.len() + k - 1) / k;
+        let block_size = data.len().div_ceil(k);
         let mut blocks = vec![vec![0u8; block_size]; k];
 
         for (i, chunk) in data.chunks(block_size).enumerate() {
@@ -78,7 +78,7 @@ proptest! {
         let m = params.parity_shares as usize;
 
         // Create data blocks
-        let block_size = (data.len() + k - 1) / k;
+        let block_size = data.len().div_ceil(k);
         let mut blocks = vec![vec![0u8; block_size]; k];
 
         for (i, chunk) in data.chunks(block_size).enumerate() {
@@ -112,7 +112,7 @@ proptest! {
         let m = params.parity_shares as usize;
 
         // Create data blocks
-        let block_size = (data.len() + k - 1) / k;
+        let block_size = data.len().div_ceil(k);
         let mut blocks = vec![vec![0u8; block_size]; k];
 
         for (i, chunk) in data.chunks(block_size).enumerate() {

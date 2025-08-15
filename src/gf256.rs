@@ -293,12 +293,12 @@ mod tests {
         assert_eq!(matrix.len(), 5);
 
         // Check identity portion
-        for i in 0..3 {
-            for j in 0..3 {
+        for (i, row) in matrix.iter().enumerate().take(3) {
+            for (j, &val) in row.iter().enumerate().take(3) {
                 if i == j {
-                    assert_eq!(matrix[i][j], Gf256::ONE);
+                    assert_eq!(val, Gf256::ONE);
                 } else {
-                    assert_eq!(matrix[i][j], Gf256::ZERO);
+                    assert_eq!(val, Gf256::ZERO);
                 }
             }
         }
@@ -315,11 +315,11 @@ mod tests {
         let inv = invert_matrix(&matrix).expect("Matrix should be invertible");
 
         // Verify A * A^-1 = I
-        for i in 0..3 {
-            for j in 0..3 {
+        for (i, row) in matrix.iter().enumerate().take(3) {
+            for (j, _) in row.iter().enumerate().take(3) {
                 let mut sum = Gf256::ZERO;
-                for k in 0..3 {
-                    sum = sum + matrix[i][k] * inv[k][j];
+                for (k, &left) in row.iter().enumerate().take(3) {
+                    sum = sum + left * inv[k][j];
                 }
                 if i == j {
                     assert_eq!(sum, Gf256::ONE);

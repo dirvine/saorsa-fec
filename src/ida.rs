@@ -233,9 +233,9 @@ mod tests {
         assert_eq!(stripes.len(), 4); // 1000 / 256 = 3.9, so 4 stripes
 
         // First 3 stripes should be full
-        for i in 0..3 {
-            assert_eq!(stripes[i].data.len(), 256);
-            assert_eq!(stripes[i].padding, 0);
+        for stripe in stripes.iter().take(3) {
+            assert_eq!(stripe.data.len(), 256);
+            assert_eq!(stripe.padding, 0);
         }
 
         // Last stripe should have padding
