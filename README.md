@@ -1,10 +1,10 @@
 # Saorsa FEC - Forward Error Correction
 
-[![CI](https://github.com/dirvine/saorsa-foundation/actions/workflows/ci.yml/badge.svg)](https://github.com/dirvine/saorsa-foundation/actions/workflows/ci.yml)
+[![CI](https://github.com/dirvine/saorsa-fec/actions/workflows/ci.yml/badge.svg)](https://github.com/dirvine/saorsa-fec/actions/workflows/ci.yml)
 [![Crates.io](https://img.shields.io/crates/v/saorsa-fec.svg)](https://crates.io/crates/saorsa-fec)
 [![Documentation](https://docs.rs/saorsa-fec/badge.svg)](https://docs.rs/saorsa-fec)
 
-Patent-free erasure coding using systematic Reed-Solomon for the Saorsa P2P network.
+Patent-free erasure coding using systematic Reed-Solomon. Standalone, production-ready, and independent of the Saorsa network or any other Saorsa crates.
 
 ## Overview
 
@@ -39,50 +39,12 @@ shards[3] = None;
 let reconstructed = rs.reconstruct(&mut shards)?;
 ```
 
-## Relationship to Saorsa Ecosystem
+## Independence
 
-Saorsa FEC is a foundational crate in the Saorsa P2P ecosystem:
+This crate is completely standalone:
 
-```
-┌─────────────────────┐
-│   Communitas App    │ ← End-user applications
-└─────────────────────┘
-           │
-┌─────────────────────┐
-│    Saorsa Core      │ ← P2P networking library
-└─────────────────────┘
-           │
-┌─────────────────────┐
-│    Saorsa MLS       │ ← Message Layer Security
-└─────────────────────┘
-           │
-┌─────────────────────┐
-│    Saorsa RSPS      │ ← Root-Scoped Provider Summaries
-└─────────────────────┘
-           │
-┌─────────────────────┐
-│    Saorsa FEC       │ ← Forward Error Correction (this crate)
-└─────────────────────┘
-           │
-┌─────────────────────┐
-│   Saorsa Types      │ ← Common types and utilities
-└─────────────────────┘
-```
-
-### Dependencies and Usage
-
-- **Zero Dependencies on Other Saorsa Crates**: This crate is dependency-free within the Saorsa ecosystem
-- **Used By**: 
-  - `saorsa-core` - For distributed data storage resilience
-  - `saorsa-rsps` - For DHT data fragment recovery
-  - Applications requiring data redundancy and fault tolerance
-
-### Integration Points
-
-- **DHT Storage**: Enables chunk recovery when nodes leave the network
-- **Message Transmission**: Provides redundancy for large message payloads
-- **Backup Systems**: Allows reconstruction of data from partial backups
-- **Network Resilience**: Maintains data availability during network partitions
+- No runtime or build-time dependency on any Saorsa components
+- No coupling to the Saorsa network; suitable for any Rust application needing erasure coding
 
 ## Performance
 
@@ -102,7 +64,7 @@ Typical performance on modern hardware:
 - **No Encryption**: This crate provides error correction, not confidentiality. Encrypt data before applying FEC if privacy is required.
 - **Side-channel considerations**: GF(256) operations in the pure-Rust backend use lookup tables (`LOG`/`EXP`). These are not strictly constant-time and may leak through cache effects on shared hardware. Avoid feeding secret-dependent inputs in adversarial multi-tenant environments, or use a side-channel-hardened backend.
 - **Memory Safety**: Pure Rust implementation with comprehensive testing; no `unsafe` in the core library.
-- **Audit Status**: Part of the security-reviewed Saorsa ecosystem.
+- **Audit Status**: Independent crate; no formal third-party audit yet.
 
 ### Storage efficiency (sharded vs original)
 
@@ -162,11 +124,6 @@ Licensed under the GNU Affero General Public License v3.0 or later.
 
 ## Contributing
 
-Contributions are welcome! Please see the [main Saorsa repository](https://github.com/dirvine/saorsa-foundation) for contribution guidelines.
+Contributions are welcome! Open issues and pull requests on the repository.
 
-## Related Crates
-
-- [`saorsa-types`](https://crates.io/crates/saorsa-types) - Common types and utilities
-- [`saorsa-core`](https://crates.io/crates/saorsa-core) - P2P networking foundation
-- [`saorsa-rsps`](https://crates.io/crates/saorsa-rsps) - DHT provider summaries
-- [`saorsa-mls`](https://crates.io/crates/saorsa-mls) - Message Layer Security
+<!-- Intentionally no cross-links to other Saorsa crates to emphasize independence -->

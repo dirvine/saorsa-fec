@@ -3,7 +3,7 @@
 
 //! # Saorsa FEC - Patent-free Erasure Coding
 //!
-//! This crate provides systematic Reed-Solomon erasure coding for the Saorsa P2P network,
+//! This crate provides standalone systematic Reed-Solomon erasure coding,
 //! implementing the Information Dispersal Algorithm (IDA) without patent encumbrance.
 //!
 //! ## Features
