@@ -1,8 +1,8 @@
 [package]
 name = "saorsa-fec"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
-authors = ["MaidSafe Developers <dev@maidsafe.net>"]
+authors = ["Saorsa Developers <dev@saorsa.net>"]
 license = "AGPL-3.0"
 description = "Patent-free erasure coding using systematic Reed-Solomon"
 repository = "https://github.com/dirvine/saorsa-fec"
