@@ -102,6 +102,7 @@ impl Gf256 {
 impl Add for Gf256 {
     type Output = Self;
 
+    #[allow(clippy::suspicious_arithmetic_impl)]
     fn add(self, other: Self) -> Self {
         Self(self.0 ^ other.0)
     }
@@ -110,6 +111,7 @@ impl Add for Gf256 {
 impl Sub for Gf256 {
     type Output = Self;
 
+    #[allow(clippy::suspicious_arithmetic_impl)]
     fn sub(self, other: Self) -> Self {
         Self(self.0 ^ other.0) // Addition and subtraction are the same in GF(256)
     }

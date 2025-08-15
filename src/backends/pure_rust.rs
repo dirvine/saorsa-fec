@@ -23,6 +23,12 @@ struct CachedMatrix {
     matrix: Vec<Vec<Gf256>>,
 }
 
+impl Default for PureRustBackend {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl PureRustBackend {
     pub fn new() -> Self {
         Self {
