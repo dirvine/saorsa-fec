@@ -29,22 +29,22 @@ pub use traits::{Fec, FecBackend};
 pub enum FecError {
     #[error("Invalid parameters: k={k}, n={n}")]
     InvalidParameters { k: usize, n: usize },
-    
+
     #[error("Insufficient shares for reconstruction: have {have}, need {need}")]
     InsufficientShares { have: usize, need: usize },
-    
+
     #[error("Share index out of bounds: {index} >= {max}")]
     InvalidShareIndex { index: usize, max: usize },
-    
+
     #[error("Data size mismatch: expected {expected}, got {actual}")]
     SizeMismatch { expected: usize, actual: usize },
-    
+
     #[error("Matrix is not invertible")]
     SingularMatrix,
-    
+
     #[error("Backend error: {0}")]
     Backend(String),
-    
+
     #[error("IO error: {0}")]
     Io(#[from] std::io::Error),
 }
@@ -71,7 +71,7 @@ impl FecParams {
                 n: (data_shares + parity_shares) as usize,
             });
         }
-        
+
         // GF(256) limits us to 255 total shares
         if data_shares as u32 + parity_shares as u32 > 255 {
             return Err(FecError::InvalidParameters {
@@ -79,25 +79,25 @@ impl FecParams {
                 n: (data_shares + parity_shares) as usize,
             });
         }
-        
+
         Ok(Self {
             data_shares,
             parity_shares,
             symbol_size: 64 * 1024, // 64KB default
         })
     }
-    
+
     /// Get total number of shares (n)
     pub fn total_shares(&self) -> u16 {
         self.data_shares + self.parity_shares
     }
-    
+
     /// Calculate parameters based on content size
     pub fn from_content_size(size: usize) -> Self {
         match size {
-            0..=1_000_000 => Self::new(8, 2).unwrap(),           // 25% overhead
-            1_000_001..=10_000_000 => Self::new(16, 4).unwrap(), // 25% overhead  
-            _ => Self::new(20, 5).unwrap(),                      // 25% overhead
+            0..=1_000_000 => Self::new(8, 2).unwrap(), // 25% overhead
+            1_000_001..=10_000_000 => Self::new(16, 4).unwrap(), // 25% overhead
+            _ => Self::new(20, 5).unwrap(),            // 25% overhead
         }
     }
 }
@@ -128,63 +128,61 @@ impl FecCodec {
         let backend = backends::create_backend()?;
         Ok(Self { params, backend })
     }
-    
+
     /// Create with specific backend
     pub fn with_backend(params: FecParams, backend: Box<dyn FecBackend>) -> Self {
         Self { params, backend }
     }
-    
+
     /// Encode data into shares
     pub fn encode(&self, data: &[u8]) -> Result<Vec<Vec<u8>>> {
         let k = self.params.data_shares as usize;
         let m = self.params.parity_shares as usize;
-        
+
         // Split data into k blocks
         let block_size = (data.len() + k - 1) / k;
         let mut data_blocks = vec![vec![0u8; block_size]; k];
-        
+
         for (i, chunk) in data.chunks(block_size).enumerate() {
             if i < k {
                 data_blocks[i][..chunk.len()].copy_from_slice(chunk);
             }
         }
-        
+
         let data_refs: Vec<&[u8]> = data_blocks.iter().map(|v| v.as_slice()).collect();
-        
+
         // Generate parity blocks
         let mut parity_blocks = vec![vec![]; m];
-        self.backend.encode_blocks(&data_refs, &mut parity_blocks, self.params)?;
-        
+        self.backend
+            .encode_blocks(&data_refs, &mut parity_blocks, self.params)?;
+
         // Combine data and parity blocks
         let mut shares = data_blocks;
         shares.extend(parity_blocks);
-        
+
         Ok(shares)
     }
-    
+
     /// Decode from available shares
     pub fn decode(&self, shares: &[Option<Vec<u8>>]) -> Result<Vec<u8>> {
         let k = self.params.data_shares as usize;
-        
+
         // Clone shares for decoding
         let mut work_shares = shares.to_vec();
-        
+
         // Decode
         self.backend.decode_blocks(&mut work_shares, self.params)?;
-        
+
         // Reconstruct original data from first k shares
         let mut data = Vec::new();
         for i in 0..k {
             if let Some(block) = &work_shares[i] {
                 data.extend_from_slice(block);
             } else {
-                return Err(FecError::InsufficientShares {
-                    have: 0,
-                    need: k,
-                });
+                return Err(FecError::InsufficientShares { have: 0, need: k });
             }
         }
-        
+
         Ok(data)
     }
 }
@@ -192,7 +190,7 @@ impl FecCodec {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_fec_params_validation() {
         assert!(FecParams::new(0, 10).is_err());
@@ -200,17 +198,17 @@ mod tests {
         assert!(FecParams::new(200, 100).is_err()); // > 255 total
         assert!(FecParams::new(10, 5).is_ok());
     }
-    
+
     #[test]
     fn test_content_size_params() {
         let small = FecParams::from_content_size(500_000);
         assert_eq!(small.data_shares, 8);
         assert_eq!(small.parity_shares, 2);
-        
+
         let medium = FecParams::from_content_size(5_000_000);
         assert_eq!(medium.data_shares, 16);
         assert_eq!(medium.parity_shares, 4);
-        
+
         let large = FecParams::from_content_size(50_000_000);
         assert_eq!(large.data_shares, 20);
         assert_eq!(large.parity_shares, 5);

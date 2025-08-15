@@ -3,8 +3,8 @@
 
 //! Performance benchmarks for FEC operations
 
-use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
-use saorsa_fec::{backends::pure_rust::PureRustBackend, FecBackend, FecParams};
+use criterion::{BenchmarkId, Criterion, Throughput, black_box, criterion_group, criterion_main};
+use saorsa_fec::{FecBackend, FecParams, backends::pure_rust::PureRustBackend};
 
 fn bench_encode(c: &mut Criterion) {
     let mut group = c.benchmark_group("encode");
@@ -110,7 +110,7 @@ fn bench_matrix_generation(c: &mut Criterion) {
 }
 
 fn bench_gf256_operations(c: &mut Criterion) {
-    use saorsa_fec::gf256::{add_slice, mul_slice, Gf256};
+    use saorsa_fec::gf256::{Gf256, add_slice, mul_slice};
 
     let mut group = c.benchmark_group("gf256");
 

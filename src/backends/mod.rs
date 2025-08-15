@@ -18,6 +18,6 @@ pub fn create_backend() -> Result<Box<dyn FecBackend>> {
             return Ok(Box::new(isa_l::IsaLBackend::new()?));
         }
     }
-    
+
     Ok(Box::new(pure_rust::PureRustBackend::new()))
 }
