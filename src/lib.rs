@@ -140,7 +140,7 @@ impl FecCodec {
         let m = self.params.parity_shares as usize;
 
         // Split data into k blocks
-        let block_size = (data.len() + k - 1) / k;
+        let block_size = data.len().div_ceil(k);
         let mut data_blocks = vec![vec![0u8; block_size]; k];
 
         for (i, chunk) in data.chunks(block_size).enumerate() {
@@ -175,8 +175,8 @@ impl FecCodec {
 
         // Reconstruct original data from first k shares
         let mut data = Vec::new();
-        for i in 0..k {
-            if let Some(block) = &work_shares[i] {
+        for maybe_block in work_shares.iter().take(k) {
+            if let Some(block) = maybe_block {
                 data.extend_from_slice(block);
             } else {
                 return Err(FecError::InsufficientShares { have: 0, need: k });

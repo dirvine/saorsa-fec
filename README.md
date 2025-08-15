@@ -99,10 +99,40 @@ Typical performance on modern hardware:
 
 ## Security Considerations
 
-- **No Encryption**: This crate only provides error correction, not confidentiality
-- **Timing Attack Resistance**: Galois field operations use constant-time implementations
-- **Memory Safety**: Pure Rust implementation with comprehensive testing
-- **Audit Status**: Part of the security-audited Saorsa ecosystem
+- **No Encryption**: This crate provides error correction, not confidentiality. Encrypt data before applying FEC if privacy is required.
+- **Side-channel considerations**: GF(256) operations in the pure-Rust backend use lookup tables (`LOG`/`EXP`). These are not strictly constant-time and may leak through cache effects on shared hardware. Avoid feeding secret-dependent inputs in adversarial multi-tenant environments, or use a side-channel-hardened backend.
+- **Memory Safety**: Pure Rust implementation with comprehensive testing; no `unsafe` in the core library.
+- **Audit Status**: Part of the security-reviewed Saorsa ecosystem.
+
+### Storage efficiency (sharded vs original)
+
+Let `k` be the number of data shares required (threshold), `m` the parity shares, and `n = k + m` the total shares.
+
+- **efficiency** = `k / n`
+- **overhead %** = `100 × m / k`
+- **storage multiplier** = `n / k`
+
+Padding from block/stripe sizing is ≤ `k - 1` bytes (block mode) or `< stripe_size` (IDA stripes) and is negligible for large files.
+
+#### Default 25% overhead across thresholds (as used by this crate)
+
+| k (threshold) | m (parity) | n (total) | efficiency k/n | overhead % | failure tolerance |
+| -------------- | ---------- | --------- | -------------- | ---------- | ----------------- |
+| 8              | 2          | 10        | 0.80           | 25%        | 2                 |
+| 12             | 3          | 15        | 0.80           | 25%        | 3                 |
+| 16             | 4          | 20        | 0.80           | 25%        | 4                 |
+| 20             | 5          | 25        | 0.80           | 25%        | 5                 |
+| 24             | 6          | 30        | 0.80           | 25%        | 6                 |
+| 32             | 8          | 40        | 0.80           | 25%        | 8                 |
+
+#### Varying parity at a fixed threshold (example: k = 16)
+
+| m | n | efficiency k/n | overhead % | failure tolerance |
+| - | - | --------------- | ---------- | ----------------- |
+| 2 | 18 | 0.888          | 12.5%      | 2                 |
+| 4 | 20 | 0.800          | 25%        | 4                 |
+| 6 | 22 | 0.727          | 37.5%      | 6                 |
+| 8 | 24 | 0.667          | 50%        | 8                 |
 
 ## Development
 

@@ -183,8 +183,8 @@ pub fn generate_cauchy_matrix(k: usize, m: usize) -> Vec<Vec<Gf256>> {
     let mut matrix = vec![vec![Gf256::ZERO; n]; n];
 
     // Identity matrix for systematic encoding
-    for i in 0..k {
-        matrix[i][i] = Gf256::ONE;
+    for (i, row) in matrix.iter_mut().enumerate().take(k) {
+        row[i] = Gf256::ONE;
     }
 
     // Cauchy matrix for parity rows
@@ -214,8 +214,8 @@ pub fn invert_matrix(matrix: &[Vec<Gf256>]) -> Option<Vec<Vec<Gf256>>> {
     let mut inv = vec![vec![Gf256::ZERO; n]; n];
 
     // Initialize inverse as identity
-    for i in 0..n {
-        inv[i][i] = Gf256::ONE;
+    for (i, row) in inv.iter_mut().enumerate().take(n) {
+        row[i] = Gf256::ONE;
     }
 
     // Gaussian elimination

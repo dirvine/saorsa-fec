@@ -18,11 +18,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Create backend and parameters
     let backend = PureRustBackend::new();
-    let params = FecParams {
-        data_shares: k as u8,
-        parity_shares: m as u8,
-        share_size: block_size,
-    };
+    let params = FecParams::new(k as u16, m as u16).unwrap();
 
     // Encode: create parity blocks
     let mut parity = vec![vec![]; m];

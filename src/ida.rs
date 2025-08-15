@@ -39,7 +39,7 @@ impl IDAConfig {
 
     /// Calculate number of stripes for given data size
     pub fn num_stripes(&self, data_len: usize) -> usize {
-        (data_len + self.stripe_size as usize - 1) / self.stripe_size as usize
+        data_len.div_ceil(self.stripe_size as usize)
     }
 
     /// Get redundancy ratio (n/k)
