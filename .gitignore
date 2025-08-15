@@ -1,0 +1,10 @@
+# Build artifacts
+/target/
+
+# Editor/OS
+.DS_Store
+.idea/
+.vscode/
+
+# Rust dependency lockfile for libraries (do not commit for lib crates)
+Cargo.lock
