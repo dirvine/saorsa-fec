@@ -79,6 +79,7 @@ pub struct StoragePipeline<B: StorageBackend> {
     /// Configuration
     config: Config,
     /// Storage backend
+    #[allow(dead_code)]
     backend: B,
     /// Chunk registry
     chunk_registry: Arc<RwLock<ChunkRegistry>>,
@@ -257,7 +258,7 @@ impl<B: StorageBackend> StoragePipeline<B> {
             let chunk_id = ChunkId::new(data_id, index);
 
             // Store chunk directly (FEC encoding integration would be more complex)
-            let chunk_hash = blake3::hash(chunk_data);
+            let _chunk_hash = blake3::hash(chunk_data);
             // TODO: Convert to v0.3 shard API
             // let cid = Cid::from_data(chunk_data);
             // let shard = Shard::new(header, chunk_data.to_vec());
@@ -295,7 +296,7 @@ impl<B: StorageBackend> StoragePipeline<B> {
     }
 
     /// Retrieve a chunk from storage
-    async fn retrieve_chunk(&self, chunk_id: &[u8; 32]) -> Result<Vec<u8>> {
+    async fn retrieve_chunk(&self, _chunk_id: &[u8; 32]) -> Result<Vec<u8>> {
         // TODO: Convert to v0.3 shard API
         // let cid = Cid::new(*chunk_id);
         // let shard = self.backend.get_shard(&cid).await?;
@@ -399,6 +400,7 @@ pub struct Pipeline {
     /// Encryption engine
     encryption: CryptoEngine,
     /// Storage backend
+    #[allow(dead_code)]
     storage: Arc<dyn StorageBackend>,
     /// Chunk registry
     chunk_registry: Arc<RwLock<ChunkRegistry>>,
@@ -539,7 +541,7 @@ impl Pipeline {
             let chunk_id = ChunkId::new(data_id, index);
 
             // For now, store chunk directly (FEC encoding would be more complex)
-            let chunk_hash = blake3::hash(chunk_data);
+            let _chunk_hash = blake3::hash(chunk_data);
             // TODO: Convert to v0.3 shard API
             // let cid = Cid::from_data(chunk_data);
             // let shard = Shard::new(header, chunk_data.to_vec());
@@ -577,7 +579,7 @@ impl Pipeline {
     }
 
     /// Retrieve a chunk from storage
-    async fn retrieve_chunk(&self, chunk_id: &[u8; 32]) -> Result<Vec<u8>> {
+    async fn retrieve_chunk(&self, _chunk_id: &[u8; 32]) -> Result<Vec<u8>> {
         // For simplicity, retrieve from storage directly
         // TODO: Convert to v0.3 shard API
         // let cid = Cid::new(*chunk_id);
@@ -588,8 +590,8 @@ impl Pipeline {
 
     /// Store a share
     #[allow(dead_code)]
-    async fn store_share(&self, share_id: &ShareId, data: &[u8]) -> Result<()> {
-        let id: [u8; 32] = blake3::hash(format!("{}", share_id).as_bytes()).into();
+    async fn store_share(&self, _share_id: &ShareId, _data: &[u8]) -> Result<()> {
+        let _id: [u8; 32] = blake3::hash(format!("{}", _share_id).as_bytes()).into();
         // TODO: Convert to v0.3 shard API
         // let cid = Cid::new(id);
         // let shard = Shard::new(header, data.to_vec());

@@ -6,7 +6,7 @@
 
 use crate::FecError;
 use crate::config::EncryptionMode;
-use anyhow::{Context, Result};
+use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -529,12 +529,12 @@ impl StorageBackend for LocalStorage {
         for meta in &metadata {
             for chunk in &meta.chunks {
                 for shard_id in &chunk.shard_ids {
-                    if let Ok(cid_bytes) = hex::decode(shard_id) {
-                        if cid_bytes.len() == 32 {
-                            let mut cid_array = [0u8; 32];
-                            cid_array.copy_from_slice(&cid_bytes);
-                            referenced_cids.insert(Cid::new(cid_array));
-                        }
+                    if let Ok(cid_bytes) = hex::decode(shard_id)
+                        && cid_bytes.len() == 32
+                    {
+                        let mut cid_array = [0u8; 32];
+                        cid_array.copy_from_slice(&cid_bytes);
+                        referenced_cids.insert(Cid::new(cid_array));
                     }
                 }
             }
@@ -567,12 +567,12 @@ impl StorageBackend for LocalStorage {
         for meta in &metadata {
             for chunk in &meta.chunks {
                 for shard_id in &chunk.shard_ids {
-                    if let Ok(cid_bytes) = hex::decode(shard_id) {
-                        if cid_bytes.len() == 32 {
-                            let mut cid_array = [0u8; 32];
-                            cid_array.copy_from_slice(&cid_bytes);
-                            referenced_cids.insert(Cid::new(cid_array));
-                        }
+                    if let Ok(cid_bytes) = hex::decode(shard_id)
+                        && cid_bytes.len() == 32
+                    {
+                        let mut cid_array = [0u8; 32];
+                        cid_array.copy_from_slice(&cid_bytes);
+                        referenced_cids.insert(Cid::new(cid_array));
                     }
                 }
             }
@@ -713,12 +713,12 @@ impl StorageBackend for MemoryStorage {
         for meta in metadata.values() {
             for chunk in &meta.chunks {
                 for shard_id in &chunk.shard_ids {
-                    if let Ok(cid_bytes) = hex::decode(shard_id) {
-                        if cid_bytes.len() == 32 {
-                            let mut cid_array = [0u8; 32];
-                            cid_array.copy_from_slice(&cid_bytes);
-                            referenced_cids.insert(Cid::new(cid_array));
-                        }
+                    if let Ok(cid_bytes) = hex::decode(shard_id)
+                        && cid_bytes.len() == 32
+                    {
+                        let mut cid_array = [0u8; 32];
+                        cid_array.copy_from_slice(&cid_bytes);
+                        referenced_cids.insert(Cid::new(cid_array));
                     }
                 }
             }
@@ -751,12 +751,12 @@ impl StorageBackend for MemoryStorage {
         for meta in metadata.values() {
             for chunk in &meta.chunks {
                 for shard_id in &chunk.shard_ids {
-                    if let Ok(cid_bytes) = hex::decode(shard_id) {
-                        if cid_bytes.len() == 32 {
-                            let mut cid_array = [0u8; 32];
-                            cid_array.copy_from_slice(&cid_bytes);
-                            referenced_cids.insert(Cid::new(cid_array));
-                        }
+                    if let Ok(cid_bytes) = hex::decode(shard_id)
+                        && cid_bytes.len() == 32
+                    {
+                        let mut cid_array = [0u8; 32];
+                        cid_array.copy_from_slice(&cid_bytes);
+                        referenced_cids.insert(Cid::new(cid_array));
                     }
                 }
             }
@@ -892,8 +892,8 @@ impl StorageBackend for NetworkStorage {
     async fn get_shard(&self, cid: &Cid) -> Result<Shard, FecError> {
         let nodes = self.select_nodes(cid.as_bytes());
 
-        for node in nodes {
-            // Try to retrieve from each node
+        if let Some(node) = nodes.into_iter().next() {
+            // Try to retrieve from the first node
             // In a real implementation, this would make network calls
             tracing::debug!(
                 "Retrieving shard {} from node: {}:{}",
@@ -930,8 +930,8 @@ impl StorageBackend for NetworkStorage {
     async fn has_shard(&self, cid: &Cid) -> Result<bool, FecError> {
         let nodes = self.select_nodes(cid.as_bytes());
 
-        for node in nodes {
-            // Check each node
+        if let Some(node) = nodes.into_iter().next() {
+            // Check the first node
             tracing::debug!(
                 "Checking shard {} on node: {}:{}",
                 cid.to_hex(),

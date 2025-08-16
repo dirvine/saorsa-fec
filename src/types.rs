@@ -23,11 +23,6 @@ impl DataId {
     pub fn as_bytes(&self) -> &[u8; 32] {
         &self.0
     }
-
-    /// Convert to string representation
-    pub fn to_string(&self) -> String {
-        hex::encode(self.0)
-    }
 }
 
 impl fmt::Display for DataId {
@@ -60,11 +55,6 @@ impl ChunkId {
     /// Get the chunk index
     pub fn index(&self) -> usize {
         self.index
-    }
-
-    /// Convert to string representation
-    pub fn to_string(&self) -> String {
-        format!("{}:{}", self.data_id, self.index)
     }
 }
 
@@ -120,11 +110,6 @@ impl VersionId {
     /// Get the raw bytes
     pub fn as_bytes(&self) -> &[u8; 32] {
         &self.0
-    }
-
-    /// Convert to string representation
-    pub fn to_string(&self) -> String {
-        hex::encode(self.0)
     }
 }
 

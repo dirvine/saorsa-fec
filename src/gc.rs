@@ -4,18 +4,13 @@
 //! collection of unreferenced chunks.
 
 use anyhow::Result;
-use async_trait::async_trait;
 use parking_lot::RwLock;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use std::sync::Arc;
 
-use crate::FecError;
 use crate::chunk_registry::ChunkRegistry;
-use crate::config::EncryptionMode;
-use crate::storage::{
-    Cid, FileMetadata, GcReport, Shard, ShardHeader, StorageBackend, StorageStats,
-};
+use crate::storage::{Cid, StorageBackend};
 use crate::version::VersionNode;
 
 /// Retention policy for garbage collection
@@ -323,6 +318,9 @@ impl GCScheduler {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::{
+        EncryptionMode, FecError, FileMetadata, GcReport, Shard, ShardHeader, StorageStats,
+    };
     use async_trait::async_trait;
 
     // Mock storage backend for testing

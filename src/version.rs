@@ -12,6 +12,9 @@ use std::sync::Arc;
 use crate::chunk_registry::ChunkRegistry;
 use crate::metadata::FileMetadata;
 
+/// Type alias for chunk diff result
+type ChunkDiff = (Vec<[u8; 32]>, Vec<[u8; 32]>);
+
 /// Node in the version tree
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VersionNode {
@@ -180,7 +183,7 @@ impl VersionManager {
 
         // Compute chunks added/removed
         let (added, removed) = if let Some(ref parent) = parent_node {
-            self.compute_chunk_diff(metadata, &parent)?
+            self.compute_chunk_diff(metadata, parent)?
         } else {
             // First version - all chunks are new
             let added = metadata.chunks.iter().map(|c| c.chunk_id).collect();
@@ -223,14 +226,14 @@ impl VersionManager {
     pub fn get_history(&self, file_id: &[u8; 32]) -> Vec<VersionNode> {
         let mut history = Vec::new();
 
-        if let Some(latest_hash) = self.file_versions.get(file_id) {
-            if let Some(mut node) = self.versions.get(latest_hash).cloned() {
-                history.push(node.clone());
+        if let Some(latest_hash) = self.file_versions.get(file_id)
+            && let Some(mut node) = self.versions.get(latest_hash).cloned()
+        {
+            history.push(node.clone());
 
-                while let Some(parent) = node.parent {
-                    history.push(parent.as_ref().clone());
-                    node = parent.as_ref().clone();
-                }
+            while let Some(parent) = node.parent {
+                history.push(parent.as_ref().clone());
+                node = parent.as_ref().clone();
             }
         }
 
@@ -331,7 +334,7 @@ impl VersionManager {
         &self,
         metadata: &FileMetadata,
         parent: &VersionNode,
-    ) -> Result<(Vec<[u8; 32]>, Vec<[u8; 32]>)> {
+    ) -> Result<ChunkDiff> {
         let parent_chunks = self.get_version_chunks(parent)?;
         let parent_set: HashSet<_> = parent_chunks.into_iter().collect();
 
