@@ -15,8 +15,8 @@ fn bench_encode(c: &mut Criterion) {
         let k = params.data_shares as usize;
         let m = params.parity_shares as usize;
 
-        // Create test data
-        let block_size = size / k;
+        // Create test data with even-sized blocks (reed-solomon-simd requirement)
+        let block_size = (size / k) & !1; // Ensure even block size
         let data: Vec<Vec<u8>> = (0..k).map(|_| vec![0u8; block_size]).collect();
         let data_refs: Vec<&[u8]> = data.iter().map(|v| v.as_slice()).collect();
 
@@ -53,8 +53,8 @@ fn bench_decode(c: &mut Criterion) {
         let k = params.data_shares as usize;
         let m = params.parity_shares as usize;
 
-        // Create and encode test data
-        let block_size = size / k;
+        // Create and encode test data with even-sized blocks
+        let block_size = (size / k) & !1; // Ensure even block size
         let data: Vec<Vec<u8>> = (0..k).map(|_| vec![0u8; block_size]).collect();
         let data_refs: Vec<&[u8]> = data.iter().map(|v| v.as_slice()).collect();
 
@@ -109,29 +109,39 @@ fn bench_matrix_generation(c: &mut Criterion) {
     group.finish();
 }
 
-fn bench_gf256_operations(c: &mut Criterion) {
-    use saorsa_fec::gf256::{Gf256, add_slice, mul_slice};
+fn bench_reed_solomon_simd_vs_params(c: &mut Criterion) {
+    let mut group = c.benchmark_group("reed_solomon_simd_params");
 
-    let mut group = c.benchmark_group("gf256");
+    // Test different parameter combinations to find optimal settings
+    let test_data_size = 1_000_000; // 1MB test
+    
+    for (k, m) in &[(8, 2), (16, 4), (20, 5), (32, 8)] {
+        let block_size = (test_data_size / k) & !1; // Ensure even
+        let data: Vec<Vec<u8>> = (0..*k).map(|_| vec![0u8; block_size]).collect();
+        let data_refs: Vec<&[u8]> = data.iter().map(|v| v.as_slice()).collect();
+        
+        let params = FecParams::new(*k as u16, *m as u16).unwrap();
+        
+        group.throughput(Throughput::Bytes((block_size * k) as u64));
+        group.bench_with_input(
+            BenchmarkId::new("encode_params", format!("{}+{}", k, m)),
+            &(k, m),
+            |b, _| {
+                let backend = PureRustBackend::new();
+                let mut parity = vec![vec![]; *m];
 
-    // Benchmark multiplication
-    let data = vec![0u8; 65536];
-    let mut result = vec![0u8; 65536];
-    let scalar = Gf256::new(7);
-
-    group.throughput(Throughput::Bytes(65536));
-    group.bench_function("mul_slice", |b| {
-        b.iter(|| {
-            mul_slice(black_box(&mut result), black_box(&data), black_box(scalar));
-        });
-    });
-
-    // Benchmark addition (XOR)
-    group.bench_function("add_slice", |b| {
-        b.iter(|| {
-            add_slice(black_box(&mut result), black_box(&data));
-        });
-    });
+                b.iter(|| {
+                    backend
+                        .encode_blocks(
+                            black_box(&data_refs),
+                            black_box(&mut parity),
+                            black_box(params),
+                        )
+                        .unwrap();
+                });
+            },
+        );
+    }
 
     group.finish();
 }
@@ -141,6 +151,6 @@ criterion_group!(
     bench_encode,
     bench_decode,
     bench_matrix_generation,
-    bench_gf256_operations
+    bench_reed_solomon_simd_vs_params
 );
 criterion_main!(benches);
