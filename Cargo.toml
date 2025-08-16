@@ -11,6 +11,17 @@ documentation = "https://docs.rs/saorsa-fec"
 readme = "README.md"
 keywords = ["erasure-coding", "reed-solomon", "fec", "ida", "p2p"]
 categories = ["cryptography", "network-programming", "encoding"]
+exclude = [
+    "src/bin/verify_v0_3.rs",
+    "tests/comprehensive_v3_tests.rs",
+    "tests/v0_3_integration_test.rs",
+    "examples/encryption_modes_demo.rs",
+    "examples/v0_3_api_demo.rs",
+    "docs/v0_3_api_guide.md",
+    "node_modules/",
+    ".claude/",
+    "package*.json"
+]
 
 [dependencies]
 # Core dependencies
