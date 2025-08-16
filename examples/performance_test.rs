@@ -13,7 +13,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let backend = PureRustBackend::new();
     println!("Using backend: {}", backend.name());
     println!("SIMD accelerated: {}", backend.is_accelerated());
-    
+
     // Report CPU features
     println!("CPU features:");
     println!("  AVX2: {}", cfg!(target_feature = "avx2"));
@@ -30,11 +30,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         // Ensure even block size for reed-solomon-simd
         let block_size = (size / k) & !1;
         let actual_size = block_size * k;
-        
-        println!("\nTesting {}MB file (actual: {:.2}MB, {}/{})", 
-                 size / 1_000_000, 
-                 actual_size as f64 / 1_000_000.0,
-                 k, k + m);
+
+        println!(
+            "\nTesting {}MB file (actual: {:.2}MB, {}/{})",
+            size / 1_000_000,
+            actual_size as f64 / 1_000_000.0,
+            k,
+            k + m
+        );
 
         // Create test data
         let data: Vec<Vec<u8>> = (0..k).map(|_| vec![0u8; block_size]).collect();
@@ -43,20 +46,28 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         // Benchmark encoding
         let start = Instant::now();
         let mut parity = vec![vec![]; m];
-        
+
         for _ in 0..5 {
             backend.encode_blocks(&data_refs, &mut parity, params)?;
         }
-        
+
         let duration = start.elapsed();
         let avg_duration = duration / 5;
         let throughput = (actual_size as f64) / avg_duration.as_secs_f64() / 1_000_000.0;
-        
-        println!("  Encoding: {:.2} MB/s ({:.2}ms)", throughput, avg_duration.as_millis());
+
+        println!(
+            "  Encoding: {:.2} MB/s ({:.2}ms)",
+            throughput,
+            avg_duration.as_millis()
+        );
 
         // Verify parity was generated
         assert!(!parity[0].is_empty(), "Parity data should be generated");
-        assert_eq!(parity[0].len(), block_size, "Parity block size should match");
+        assert_eq!(
+            parity[0].len(),
+            block_size,
+            "Parity block size should match"
+        );
     }
 
     println!("\nTest completed successfully!");

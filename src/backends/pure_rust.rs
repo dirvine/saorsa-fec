@@ -3,9 +3,7 @@
 
 //! High-performance Reed-Solomon implementation using reed-solomon-simd
 
-use crate::{
-    FecBackend, FecError, FecParams, Result,
-};
+use crate::{FecBackend, FecError, FecParams, Result};
 use reed_solomon_simd::ReedSolomonEncoder;
 
 /// High-performance Reed-Solomon backend using SIMD optimizations
@@ -57,7 +55,7 @@ impl PureRustBackend {
         // Ensure block size is even (requirement of reed-solomon-simd)
         if block_size % 2 != 0 {
             return Err(FecError::Backend(
-                "Shard size must be even for reed-solomon-simd".to_string()
+                "Shard size must be even for reed-solomon-simd".to_string(),
             ));
         }
 
@@ -67,12 +65,15 @@ impl PureRustBackend {
 
         // Add original shards
         for block in data_blocks {
-            encoder.add_original_shard(block)
+            encoder
+                .add_original_shard(block)
                 .map_err(|e| FecError::Backend(e.to_string()))?;
         }
-        
+
         // Generate recovery shards
-        let result = encoder.encode().map_err(|e| FecError::Backend(e.to_string()))?;
+        let result = encoder
+            .encode()
+            .map_err(|e| FecError::Backend(e.to_string()))?;
 
         // Copy recovery shards to output
         let recovery_shards: Vec<_> = result.recovery_iter().collect();
@@ -105,14 +106,15 @@ impl PureRustBackend {
         }
 
         // Get block size from first available share
-        let _block_size = shares.iter()
+        let _block_size = shares
+            .iter()
             .find_map(|s| s.as_ref().map(|data| data.len()))
             .ok_or(FecError::InsufficientShares { have: 0, need: k })?;
 
         // reed-solomon-simd doesn't have a direct decoder - we need to use a different approach
         // For now, fall back to simple reconstruction using available systematic shares
         // This is a simplified implementation that assumes we have enough original shares
-        
+
         // If we have at least k original (data) shares, we don't need to decode parity
         let original_available = (0..k).filter(|&i| shares[i].is_some()).count();
         if original_available >= k {
@@ -123,7 +125,7 @@ impl PureRustBackend {
         // The reed-solomon-simd crate is primarily designed for encoding
         // For now, return an error if we need complex reconstruction
         Err(FecError::Backend(
-            "Complex reconstruction not yet implemented with reed-solomon-simd".to_string()
+            "Complex reconstruction not yet implemented with reed-solomon-simd".to_string(),
         ))
     }
 }
@@ -151,19 +153,19 @@ impl FecBackend for PureRustBackend {
         // reed-solomon-simd doesn't expose matrix generation directly
         // Return a placeholder identity + vandermonde-like matrix for compatibility
         let mut matrix = vec![vec![0u8; k]; k + m];
-        
+
         // Identity matrix for data shards
         for i in 0..k {
             matrix[i][i] = 1;
         }
-        
+
         // Vandermonde-like matrix for parity shards (simplified)
         for i in k..(k + m) {
             for j in 0..k {
                 matrix[i][j] = ((i - k + 1) * (j + 1)) as u8;
             }
         }
-        
+
         matrix
     }
 
@@ -226,7 +228,7 @@ mod tests {
         // Encode should fail due to odd block size
         let mut parity = vec![vec![]];
         let result = backend.encode_blocks(&data_blocks, &mut parity, params);
-        
+
         assert!(result.is_err());
         assert!(result.unwrap_err().to_string().contains("even"));
     }
@@ -237,14 +239,16 @@ mod tests {
         let params = FecParams::new(4, 2).unwrap();
 
         // Create test data with even-sized blocks
-        let data: Vec<Vec<u8>> = (0..4).map(|i| {
-            let mut v = Vec::new();
-            for _ in 0..50 {
-                v.push(i as u8);
-                v.push((i+1) as u8);
-            }
-            v
-        }).collect(); // 100 bytes each, even
+        let data: Vec<Vec<u8>> = (0..4)
+            .map(|i| {
+                let mut v = Vec::new();
+                for _ in 0..50 {
+                    v.push(i as u8);
+                    v.push((i + 1) as u8);
+                }
+                v
+            })
+            .collect(); // 100 bytes each, even
         let data_refs: Vec<&[u8]> = data.iter().map(|v| v.as_slice()).collect();
 
         // Encode

@@ -41,11 +41,11 @@ pub use traits::{Fec, FecBackend};
 
 // v0.3 API exports
 pub use config::EncryptionMode;
-pub use pipeline::{StoragePipeline, Meta, PipelineStats};
+pub use pipeline::{Meta, PipelineStats, StoragePipeline};
 pub use storage::{
-    StorageBackend, LocalStorage, MemoryStorage, MultiStorage, NetworkStorage,
-    Cid, Shard, ShardHeader, ChunkMeta, FileMetadata, StorageStats, GcReport,
-    MultiStorageStrategy, NodeEndpoint
+    ChunkMeta, Cid, FileMetadata, GcReport, LocalStorage, MemoryStorage, MultiStorage,
+    MultiStorageStrategy, NetworkStorage, NodeEndpoint, Shard, ShardHeader, StorageBackend,
+    StorageStats,
 };
 
 /// Errors that can occur during FEC operations

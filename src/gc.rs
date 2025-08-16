@@ -4,13 +4,18 @@
 //! collection of unreferenced chunks.
 
 use anyhow::Result;
+use async_trait::async_trait;
 use parking_lot::RwLock;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use std::sync::Arc;
 
+use crate::FecError;
 use crate::chunk_registry::ChunkRegistry;
-use crate::storage::StorageBackend;
+use crate::config::EncryptionMode;
+use crate::storage::{
+    Cid, FileMetadata, GcReport, Shard, ShardHeader, StorageBackend, StorageStats,
+};
 use crate::version::VersionNode;
 
 /// Retention policy for garbage collection
@@ -115,7 +120,8 @@ impl GarbageCollector {
             }
 
             // Attempt to delete from storage
-            match self.storage.delete_chunk(&chunk_id).await {
+            let cid = Cid::new(chunk_id);
+            match self.storage.delete_shard(&cid).await {
                 Ok(()) => {
                     // Remove from registry after successful deletion
                     let mut registry = self.chunk_registry.write();
@@ -341,28 +347,62 @@ mod tests {
 
     #[async_trait]
     impl StorageBackend for MockStorage {
-        async fn put_chunk(&self, _id: &[u8; 32], _data: &[u8]) -> Result<()> {
+        async fn put_shard(&self, _cid: &Cid, _shard: &Shard) -> Result<(), FecError> {
             Ok(())
         }
 
-        async fn get_chunk(&self, _id: &[u8; 32]) -> Result<Vec<u8>> {
-            Ok(vec![])
+        async fn get_shard(&self, _cid: &Cid) -> Result<Shard, FecError> {
+            let header = ShardHeader::new(EncryptionMode::Convergent, (3, 2), 0, [0u8; 32]);
+            Ok(Shard::new(header, vec![]))
         }
 
-        async fn delete_chunk(&self, id: &[u8; 32]) -> Result<()> {
-            if self.fail_on.contains(id) {
-                anyhow::bail!("Mock deletion failure")
+        async fn delete_shard(&self, cid: &Cid) -> Result<(), FecError> {
+            if self.fail_on.contains(cid.as_bytes()) {
+                return Err(FecError::Backend("Mock deletion failure".to_string()));
             }
-            self.deleted.write().push(*id);
+            self.deleted.write().push(*cid.as_bytes());
             Ok(())
         }
 
-        async fn has_chunk(&self, _id: &[u8; 32]) -> Result<bool> {
+        async fn has_shard(&self, _cid: &Cid) -> Result<bool, FecError> {
             Ok(false)
         }
 
-        async fn list_chunks(&self) -> Result<Vec<[u8; 32]>> {
+        async fn list_shards(&self) -> Result<Vec<Cid>, FecError> {
             Ok(vec![])
+        }
+
+        async fn put_metadata(&self, _metadata: &FileMetadata) -> Result<(), FecError> {
+            Ok(())
+        }
+
+        async fn get_metadata(&self, _file_id: &[u8; 32]) -> Result<FileMetadata, FecError> {
+            Err(FecError::Backend("Mock metadata not found".to_string()))
+        }
+
+        async fn delete_metadata(&self, _file_id: &[u8; 32]) -> Result<(), FecError> {
+            Ok(())
+        }
+
+        async fn list_metadata(&self) -> Result<Vec<FileMetadata>, FecError> {
+            Ok(vec![])
+        }
+
+        async fn stats(&self) -> Result<StorageStats, FecError> {
+            Ok(StorageStats {
+                total_shards: 0,
+                total_size: 0,
+                metadata_count: 0,
+                unreferenced_shards: 0,
+            })
+        }
+
+        async fn garbage_collect(&self) -> Result<GcReport, FecError> {
+            Ok(GcReport {
+                shards_deleted: 0,
+                bytes_freed: 0,
+                duration_ms: 0,
+            })
         }
     }
 

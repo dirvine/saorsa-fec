@@ -10,8 +10,12 @@ use aes_gcm::{
     aead::{Aead, AeadCore, KeyInit, OsRng},
 };
 use anyhow::{Context, Result};
-use blake3::Hasher;
+// blake3::Hasher removed as we're using SHA-256 for v0.3 spec
+use hkdf::Hkdf;
+use rand_core::RngCore;
 use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
+use subtle::ConstantTimeEq;
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 /// Encryption configuration
@@ -187,31 +191,126 @@ impl Default for CryptoEngine {
     }
 }
 
-/// Derive a convergent encryption key from content
+/// Derive a convergent encryption key from content using SHA-256 HKDF
+///
+/// **SECURITY NOTE**: This implements the v0.3 specification for convergent
+/// encryption. While deterministic for deduplication, it has security implications:
+/// - Identical plaintexts produce identical keys and ciphertexts
+/// - No semantic security for identical content
+/// - Consider using ConvergentWithSecret or RandomKey modes for sensitive data
 pub fn derive_convergent_key(content: &[u8], secret: Option<&[u8; 32]>) -> EncryptionKey {
-    let mut hasher = Hasher::new();
+    // Use SHA-256 hash of content as the input key material (IKM)
+    let mut hasher = Sha256::new();
 
-    // Domain separation
-    hasher.update(b"saorsa-fec-v1-key");
-
-    // Include secret if provided
+    // Include secret if provided for controlled deduplication
     if let Some(s) = secret {
         hasher.update(s);
     }
 
     // Include content for convergence
     hasher.update(content);
+    let content_hash = hasher.finalize();
 
-    let hash = hasher.finalize();
-    EncryptionKey::new(*hash.as_bytes())
+    // Use a fixed salt for deterministic behavior with domain separation
+    let salt = {
+        let mut salt_hasher = Sha256::new();
+        salt_hasher.update(b"saorsa-fec-v0.3-salt");
+        salt_hasher.update(b"convergent-encryption");
+        salt_hasher.finalize()
+    };
+
+    // HKDF with proper salt and info for key derivation
+    let hkdf = Hkdf::<Sha256>::new(Some(&salt), &content_hash);
+    let mut key = [0u8; 32];
+    hkdf.expand(b"saorsa-fec:aead:v1", &mut key)
+        .expect("HKDF expand should never fail with valid parameters");
+
+    let encryption_key = EncryptionKey::new(key);
+
+    // Zeroize the intermediate key material
+    let mut key_to_zero = key;
+    key_to_zero.zeroize();
+
+    encryption_key
 }
 
-/// Generate a random encryption key
+/// Generate a random encryption key using cryptographically secure RNG
 pub fn generate_random_key() -> EncryptionKey {
     let mut key = [0u8; 32];
-    use rand::RngCore;
-    rand::thread_rng().fill_bytes(&mut key);
-    EncryptionKey::new(key)
+    OsRng.fill_bytes(&mut key);
+    let encryption_key = EncryptionKey::new(key);
+
+    // Zeroize the key array after use
+    key.zeroize();
+
+    encryption_key
+}
+
+/// Generate deterministic nonce for convergent encryption (v0.3 specification)
+///
+/// **SECURITY WARNING**: This function generates deterministic nonces as required
+/// by the v0.3 specification for convergent encryption and deduplication. While
+/// this enables deduplication, it has important security implications:
+///
+/// 1. **Identical plaintexts produce identical ciphertexts** - This can leak
+///    information about data patterns across different files.
+/// 2. **No semantic security** - Attackers who know plaintext can verify
+///    their guesses by comparing ciphertexts.
+/// 3. **Partial information leakage** - Common file patterns may be detectable.
+///
+/// This trade-off is intentional for deduplication purposes but should be
+/// clearly understood by users of the system.
+///
+/// Formula: `H(file_id || chunk_index || shard_index)[..12]`
+pub fn generate_deterministic_nonce(
+    file_id: &[u8; 32],
+    chunk_index: u32,
+    shard_index: u16,
+) -> [u8; 12] {
+    let mut hasher = Sha256::new();
+
+    // Domain separation for nonce generation
+    hasher.update(b"saorsa-fec-nonce-v0.3");
+    hasher.update(file_id);
+    hasher.update(&chunk_index.to_le_bytes());
+    hasher.update(&shard_index.to_le_bytes());
+
+    let hash = hasher.finalize();
+    let mut nonce = [0u8; 12];
+    nonce.copy_from_slice(&hash[..12]);
+    nonce
+}
+
+/// Verify MAC in constant time to prevent timing attacks
+///
+/// **SECURITY**: Uses constant-time comparison to prevent timing-based
+/// side-channel attacks that could be used to forge authentication tags.
+pub fn verify_mac_constant_time(computed: &[u8], stored: &[u8]) -> bool {
+    if computed.len() != stored.len() {
+        return false;
+    }
+
+    computed.ct_eq(stored).into()
+}
+
+/// Derive MAC key with proper domain separation
+///
+/// Derives a separate key for message authentication to prevent
+/// key correlation between encryption and authentication operations.
+pub fn derive_mac_key(encryption_key: &EncryptionKey) -> [u8; 32] {
+    let salt = {
+        let mut salt_hasher = Sha256::new();
+        salt_hasher.update(b"saorsa-fec-v0.3-salt");
+        salt_hasher.update(b"mac-key-derivation");
+        salt_hasher.finalize()
+    };
+
+    let hkdf = Hkdf::<Sha256>::new(Some(&salt), encryption_key.as_bytes());
+    let mut mac_key = [0u8; 32];
+    hkdf.expand(b"saorsa-fec:mac:v1", &mut mac_key)
+        .expect("HKDF expand should never fail with valid parameters");
+
+    mac_key
 }
 
 /// Compute convergence secret ID
