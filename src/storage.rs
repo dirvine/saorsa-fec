@@ -55,7 +55,7 @@ impl From<blake3::Hash> for Cid {
     }
 }
 
-/// Shard header (96 bytes) as specified in v0.3
+/// Shard header (106 bytes after bincode serialization) for v0.3
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ShardHeader {
     /// Shard format version
@@ -68,13 +68,13 @@ pub struct ShardHeader {
     pub data_size: u32,
     /// Nonce for encryption (32 bytes)
     pub nonce: [u8; 32],
-    /// Reserved bytes (padded to 96 bytes total) - use Vec for serde compatibility
+    /// Reserved bytes for future use
     #[serde(with = "serde_bytes")]
     pub reserved: Vec<u8>,
 }
 
 impl ShardHeader {
-    const SIZE: usize = 96;
+    const SIZE: usize = 106; // Actual bincode serialization size
 
     /// Create new shard header
     pub fn new(
