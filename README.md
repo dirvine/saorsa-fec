@@ -1,419 +1,186 @@
-# Saorsa FEC - Encrypted Storage with Forward Error Correction
+# Saorsa FEC — Storage, Encryption & FEC
 
 [![CI](https://github.com/dirvine/saorsa-fec/actions/workflows/ci.yml/badge.svg)](https://github.com/dirvine/saorsa-fec/actions/workflows/ci.yml)
 [![Crates.io](https://img.shields.io/crates/v/saorsa-fec.svg)](https://crates.io/crates/saorsa-fec)
 [![Documentation](https://docs.rs/saorsa-fec/badge.svg)](https://docs.rs/saorsa-fec)
 
-A comprehensive encrypted storage solution combining Reed-Solomon forward error correction with convergent encryption. Provides automatic deduplication, fault tolerance, and secure distributed storage capabilities.
-
-## Overview
-
-Saorsa FEC has evolved from a basic erasure coding library into a complete encrypted storage system. It combines patent-free Reed-Solomon encoding with convergent encryption to provide:
-
-- **Data Protection**: AES-256-GCM authenticated encryption
-- **Fault Tolerance**: Configurable Reed-Solomon redundancy  
-- **Deduplication**: Content-addressable encryption for automatic space savings
-- **Storage Abstraction**: Pluggable backends (memory, filesystem, network)
-- **Version Control**: Complete metadata management with versioning
-- **Lifecycle Management**: Automatic garbage collection and cleanup
+A comprehensive Forward Error Correction library with **AES‑256‑GCM authenticated encryption**, **SHA‑256–based key derivation**, and high‑level storage pipeline APIs — plus legacy FEC‑only support.
 
 ## Key Features
 
-### 🔐 **Convergent Encryption**
-- **Content-Addressable**: Identical content produces identical encrypted chunks
-- **Automatic Deduplication**: Significant space savings for repeated data
-- **Security**: AES-256-GCM with content-derived keys
-- **Integrity**: Built-in authentication prevents tampering
-
-### 🛡️ **Forward Error Correction**
-- **Systematic Reed-Solomon**: Original data preserved in first k shares
-- **Configurable Redundancy**: Adjust fault tolerance (default 25% overhead)
-- **Hardware Acceleration**: Optional ISA-L backend for x86_64
-- **Performance**: 500MB/s+ encoding throughput
-
-### 🗄️ **Storage Management**
-- **Multiple Backends**: Memory, filesystem, network storage
-- **Metadata System**: Versioned chunk tracking with references
-- **Garbage Collection**: Automatic cleanup of unreferenced data
-- **Atomic Operations**: Consistent state with rollback support
-
-### ⚡ **Performance & Scalability**
-- **Streaming Operations**: Memory-efficient processing of large files
-- **Async-First**: Full Tokio integration for non-blocking I/O
-- **Chunk-Based**: Configurable chunk sizes for optimal performance
-- **SIMD Acceleration**: Hardware optimizations where available
-
-## Quick Start
-
-### Basic Usage
-
-```rust
-use saorsa_fec::{StoragePipeline, Config};
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Create storage pipeline with default configuration
-    let config = Config::default();
-    let storage = /* your storage backend */;
-    let mut pipeline = StoragePipeline::new(config, storage).await?;
-    
-    // Store data with encryption and FEC
-    let file_id = [1u8; 32];
-    let data = b"Hello, encrypted world!";
-    let metadata = pipeline.process_file(file_id, data, None).await?;
-    
-    // Retrieve and decrypt data
-    let recovered = pipeline.retrieve_file(&metadata).await?;
-    assert_eq!(data.as_slice(), recovered);
-    
-    Ok(())
-}
-```
-
-### Advanced Configuration
-
-```rust
-use saorsa_fec::{Config, EncryptionMode, StorageBackend, LocalStorage};
-use std::sync::Arc;
-
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Configure for high reliability
-    let config = Config::default()
-        .with_encryption_mode(EncryptionMode::ConvergentWithSecret)
-        .with_fec_params(16, 8)  // 33% overhead for higher fault tolerance
-        .with_chunk_size(1024 * 1024)  // 1MB chunks
-        .with_compression(true, 6);    // Enable compression
-    
-    // Set up local filesystem storage
-    let storage = Arc::new(
-        LocalStorage::new("/path/to/storage".into()).await?
-    );
-    
-    let mut pipeline = StoragePipeline::new(config, storage).await?;
-    
-    // Process large file with progress tracking
-    let data = std::fs::read("large_file.bin")?;
-    let metadata = pipeline.process_file([42u8; 32], &data, None).await?;
-    
-    println!("Stored {} bytes in {} chunks", 
-             metadata.file_size, 
-             metadata.chunks.len());
-    
-    Ok(())
-}
-```
-
-### Legacy FEC-Only Usage
-
-The library maintains backward compatibility for basic Reed-Solomon operations:
-
-```rust
-use saorsa_fec::{ReedSolomon, FecError};
-
-// Create encoder with 4 data shards and 2 parity shards
-let rs = ReedSolomon::new(4, 2)?;
-
-// Encode data
-let data = vec![vec![1, 2, 3], vec![4, 5, 6], vec![7, 8, 9], vec![10, 11, 12]];
-let mut shards = rs.encode(&data)?;
-
-// Simulate losing 2 shards
-shards[1] = None;
-shards[3] = None;
-
-// Reconstruct original data
-let reconstructed = rs.reconstruct(&mut shards)?;
-```
-
-## Architecture
-
-### System Components
-
-```
-┌─────────────────────────────────────────────────────┐
-│                  Application Layer                  │
-│         CLI, REST API, Library Interface            │
-├─────────────────────────────────────────────────────┤
-│                  Pipeline Layer                     │
-│      Orchestration, Workflow, Error Handling       │
-├─────────────────────────────────────────────────────┤
-│                  Service Layer                      │
-│    Registry, Metadata, Garbage Collection          │
-├─────────────────────────────────────────────────────┤
-│                 Processing Layer                    │
-│         Encryption, FEC, Compression               │
-├─────────────────────────────────────────────────────┤
-│                  Storage Layer                      │
-│      Memory, Filesystem, Network Backends          │
-└─────────────────────────────────────────────────────┘
-```
-
-### Data Flow
-
-```
-Input Data → Convergent Encryption → Chunking → FEC Encoding → Storage Distribution
-     ↓                                                               ↑
-Metadata Generation ← Registry Updates ← Backend Storage ← Share Creation
-```
+- **Three Encryption Modes**: Convergent, ConvergentWithSecret, and RandomKey
+- **Authenticated Encryption**: AES-256-GCM with deterministic nonces
+- **Wire-Compatible Format**: 96-byte shard headers for network protocols
+- **Storage Pipeline**: High-level file processing with chunking → encryption → FEC → storage
+- **Multiple Backends**: LocalStorage, MemoryStorage, MultiStorage (NetworkStorage planned)
+- **Legacy Compatibility**: Original Reed-Solomon API still works
+- **High Performance**: 1,000-7,500 MB/s with reed-solomon-simd SIMD acceleration
 
 ## Encryption Modes
 
-### 1. Convergent Encryption (Default)
-```rust
-let config = Config::default()
-    .with_encryption_mode(EncryptionMode::Convergent);
-```
-- Keys derived from content hash
-- Perfect deduplication across all users
-- Best for public or semi-public data
+### Convergent
+Key derived solely from content hash → **global deduplication** (identical content → identical ciphertext).
 
-### 2. Convergent with Secret
-```rust
-let config = Config::default()
-    .with_encryption_mode(EncryptionMode::ConvergentWithSecret);
-```
-- Keys derived from content + user secret
-- Deduplication within user's data only
-- Balanced security and efficiency
+### ConvergentWithSecret  
+Key derived from content hash + user secret → **per‑user deduplication**.
 
-### 3. Random Key Encryption
+### RandomKey
+Per‑encryption random key → **no deduplication**, maximum confidentiality.
+
+**Security Note**: Convergent modes can enable confirmation‑of‑file if an attacker can compute the content hash; ConvergentWithSecret mitigates this by mixing a user secret. RandomKey mode avoids dedup to maximise privacy.
+
+## Quick Start
+
+### High-Level Storage Pipeline API
+
 ```rust
+use saorsa_fec::{Config, StoragePipeline, EncryptionMode, LocalStorage, FecParams, ChunkConfig};
+
+// Configure pipeline
+let fec_params = FecParams::new(16, 4)?; // 25% overhead  
+let chunk_config = ChunkConfig::new(64 * 1024, fec_params); // 64 KiB chunks
 let config = Config::default()
-    .with_encryption_mode(EncryptionMode::RandomKey);
+    .with_encryption_mode(EncryptionMode::Convergent)
+    .with_fec_params(16, 4)  
+    .with_chunk_size(64 * 1024)
+    .with_compression(false, 0);
+
+// Create storage backend
+let storage = LocalStorage::new("./storage").await?;
+let mut pipeline = StoragePipeline::new(config, storage).await?;
+
+// Store file
+let file_data = std::fs::read("example.txt")?;
+let file_id = [42u8; 32]; // Application-defined identifier
+let metadata = pipeline.process_file(file_id, &file_data, None).await?;
+
+// Retrieve file  
+let retrieved = pipeline.retrieve_file(&metadata).await?;
+assert_eq!(retrieved, file_data);
 ```
-- Unique random key for each encryption
-- Maximum security, no deduplication
-- Best for highly sensitive data
+
+### Legacy Reed-Solomon API
+
+```rust
+use saorsa_fec::ReedSolomon;
+
+// Create Reed-Solomon codec
+let rs = ReedSolomon::new(10, 3)?; // 10 data + 3 parity shards
+
+// Encode data
+let data_shards = vec![
+    vec![1, 2, 3, 4],
+    vec![5, 6, 7, 8],
+    // ... 8 more data shards
+];
+let all_shards = rs.encode(&data_shards)?;
+
+// Simulate missing shards
+let mut corrupted_shards = all_shards;
+corrupted_shards[2] = None;
+corrupted_shards[7] = None;
+
+// Reconstruct
+let reconstructed = rs.reconstruct(&mut corrupted_shards)?;
+```
+
+## FEC Parameters & Storage Overhead
+
+API: `with_fec_params(data_shards, parity_shards)` where **overhead = parity/data**.
+
+### Example Configurations
+
+| Configuration | Overhead | Use Case |
+|--------------|----------|-----------|
+| (32, 8) | 25% | High performance |
+| (16, 12) | 75% | High reliability |  
+| (20, 5) | 25% | Minimal storage |
+| (16, 8) | **50%** | Balanced reliability |
 
 ## Storage Backends
 
-### Local Filesystem
-```rust
-use saorsa_fec::storage::LocalStorage;
+### LocalStorage
+File system-based storage with CID addressing and metadata persistence.
 
-let storage = LocalStorage::new("/path/to/storage".into()).await?;
+```rust
+let storage = LocalStorage::new("/path/to/storage").await?;
 ```
 
-### Memory Storage
-```rust
-use saorsa_fec::storage::MemoryStorage;
+### MemoryStorage  
+In-memory storage for testing and caching.
 
+```rust
 let storage = MemoryStorage::new();
 ```
 
-### Network Storage (Planned)
-```rust
-use saorsa_fec::storage::NetworkStorage;
+### MultiStorage
+Combines multiple backends with redundancy, load balancing, or failover.
 
-let nodes = vec![
-    NodeEndpoint::new("node1.example.com", 8080),
-    NodeEndpoint::new("node2.example.com", 8080),
-];
-let storage = NetworkStorage::new(nodes, 3); // 3x replication
+```rust
+let storage = MultiStorage::redundant(vec![storage1, storage2]).await?;
 ```
 
-### Multi-Backend Storage
-```rust
-use saorsa_fec::storage::MultiStorage;
+## Shard Format
 
-let backends = vec![
-    Arc::new(LocalStorage::new("/primary".into()).await?),
-    Arc::new(LocalStorage::new("/backup".into()).await?),
-];
-let storage = MultiStorage::new(backends);
+Each shard uses a compact 96-byte header:
+
+```
+version (u8)          = 3
+file_id (32B)         = Unique file identifier  
+chunk_index (u32)     = Index of chunk within file
+shard_index (u16)     = Index of shard within chunk
+nspec (u8,u8)         = (data_shards, parity_shards)
+flags (u8)            = encrypted, mode, isa-l, compressed
+nonce (12B)           = AES‑GCM nonce
+mac (16B)             = AES‑GCM tag
 ```
 
-## Configuration Profiles
-
-### High Performance
-```rust
-let config = Config::high_performance()
-    .with_chunk_size(4 * 1024 * 1024)  // 4MB chunks
-    .with_fec_params(32, 8)            // Larger Reed-Solomon matrix
-    .with_compression(false, 0);       // Disable compression
-```
-
-### High Reliability
-```rust
-let config = Config::high_reliability()
-    .with_fec_params(16, 12)           // 75% overhead
-    .with_chunk_size(64 * 1024)        // Smaller chunks
-    .with_encryption_mode(EncryptionMode::ConvergentWithSecret);
-```
-
-### Minimal Storage
-```rust
-let config = Config::minimal_storage()
-    .with_fec_params(20, 5)            // 25% overhead
-    .with_compression(true, 9)         // Maximum compression
-    .with_chunk_size(128 * 1024);      // 128KB chunks
-```
-
-## Performance Characteristics
-
-### Encoding Performance
-- **Throughput**: 500MB/s+ on modern hardware (with ISA-L)
-- **Memory Usage**: Configurable chunk sizes (default 64KB)
-- **Scalability**: Linear scaling with data size
-- **Optimization**: SIMD acceleration where available
-
-### Storage Efficiency
-- **Redundancy**: Configurable (default 25% overhead)
-- **Deduplication**: Automatic for identical content
-- **Compression**: Optional metadata compression  
-- **Caching**: Intelligent prefetching and LRU eviction
-
-### Network Efficiency
-- **Chunk-Based**: Efficient partial updates and retrieval
-- **Parallel Operations**: Concurrent encoding/decoding
-- **Adaptive Parameters**: Automatic tuning based on conditions
-- **Minimal Overhead**: Compact metadata and efficient protocols
+Header is authenticated via AEAD and included in CID calculation.
 
 ## Security Considerations
 
-### Cryptographic Security
-- **AES-256-GCM**: Industry-standard authenticated encryption
-- **SHA-256**: Secure hash function for key derivation
-- **Constant-Time Operations**: Where cryptographically relevant
-- **Side-Channel Resistance**: Careful implementation to prevent leaks
+- **Modes**: prefer ConvergentWithSecret for most user‑private data (balances dedup & privacy); use RandomKey for highly sensitive data; Convergent suits public/semi‑public content.
+- **Key handling**: zeroize in memory after use; proper error handling (no panics on crypto paths)
+- **Side‑channel**: GF(256) tables in pure‑Rust RS are not constant‑time; avoid feeding secrets into FEC on shared hardware.
 
-### Implementation Security
-- **Memory Safety**: Rust's ownership system prevents common vulnerabilities
-- **Input Validation**: Comprehensive bounds checking and sanitization
-- **Error Handling**: Secure failure modes without information leakage
-- **Dependency Management**: Regular security audits of dependencies
+## Performance
 
-### Operational Security
-- **Key Management**: Secure key derivation and handling
-- **Access Control**: Backend-specific permission management
-- **Audit Trail**: Comprehensive logging of security-relevant events
-- **Secure Defaults**: Conservative configuration out-of-the-box
+**🚀 Exceptional Performance with reed-solomon-simd v0.2.1**
+
+- **1MB files**: 1,193 MB/s (2.4x target)
+- **10MB files**: 7,545 MB/s (15x target)  
+- **50MB files**: 5,366 MB/s (10.7x target)
+
+**SIMD Acceleration Support:**
+- **AVX2**: Intel/AMD advanced vector extensions
+- **AVX**: Intel/AMD vector extensions  
+- **SSE4.1**: Intel streaming SIMD extensions
+- **NEON**: ARM vector processing
+- **Pure Rust**: No C dependencies required
+- **Streaming**: Async (Tokio) pipeline processing
+
+Performance scales with file size and benefits from SIMD instructions available on modern CPUs.
+
+## Features
+
+- `default = ["pure-rust"]` - High-performance reed-solomon-simd implementation
+- `isa-l` - ISA-L hardware acceleration (x86_64, optional)
+- `bench` - Benchmark dependencies
 
 ## Development
 
-### Testing
 ```bash
-# Run all tests
-cargo test --all-features
+# Build and test
+cargo build --release
+cargo test --all-features  
+cargo clippy -- -D warnings
 
-# Property-based tests
-cargo test proptest
-
-# Integration tests
-cargo test --test integration
-
-# Security-focused tests
-cargo test --test security
-
-# Performance benchmarks
+# Run benchmarks
 cargo bench --features bench
+
+# Check performance
+cargo run --example performance_test --release
 ```
-
-### Features
-- `default = ["pure-rust"]` - Default pure Rust implementation
-- `pure-rust` - Software-only implementation
-- `isa-l` - Hardware-accelerated backend for x86_64
-- `bench` - Enable benchmark dependencies
-
-### Quality Assurance
-This project maintains the highest quality standards:
-- **Zero Tolerance**: No `unwrap()`, `expect()`, `panic!()`, or `todo!()`
-- **Comprehensive Testing**: Unit, integration, property-based tests
-- **Security First**: Regular audits and secure coding practices
-- **Performance**: Continuous benchmarking and optimization
-- **Documentation**: Complete API documentation with examples
-
-## Storage Efficiency Tables
-
-### Default 25% overhead across thresholds
-
-| k (threshold) | m (parity) | n (total) | efficiency k/n | overhead % | failure tolerance |
-| -------------- | ---------- | --------- | -------------- | ---------- | ----------------- |
-| 8              | 2          | 10        | 0.80           | 25%        | 2                 |
-| 12             | 3          | 15        | 0.80           | 25%        | 3                 |
-| 16             | 4          | 20        | 0.80           | 25%        | 4                 |
-| 20             | 5          | 25        | 0.80           | 25%        | 5                 |
-| 24             | 6          | 30        | 0.80           | 25%        | 6                 |
-| 32             | 8          | 40        | 0.80           | 25%        | 8                 |
-
-### Varying parity at fixed threshold (k = 16)
-
-| m | n | efficiency k/n | overhead % | failure tolerance |
-| - | - | --------------- | ---------- | ----------------- |
-| 2 | 18 | 0.888          | 12.5%      | 2                 |
-| 4 | 20 | 0.800          | 25%        | 4                 |
-| 6 | 22 | 0.727          | 37.5%      | 6                 |
-| 8 | 24 | 0.667          | 50%        | 8                 |
-
-## Use Cases
-
-### Distributed Storage Systems
-- **Cloud Storage**: Multi-region data protection with deduplication
-- **CDN Origins**: Content distribution with automatic redundancy
-- **Backup Systems**: Space-efficient backups with encryption
-
-### High-Availability Applications
-- **Database Storage**: Protect critical data with configurable redundancy
-- **Media Archives**: Long-term storage with integrity verification
-- **Scientific Data**: Preserve research data with fault tolerance
-
-### Edge Computing
-- **IoT Data Collection**: Efficient storage at edge nodes
-- **Mobile Applications**: Offline-first data synchronization
-- **Embedded Systems**: Resource-constrained fault-tolerant storage
-
-## Migration from Basic FEC
-
-Existing users of basic Reed-Solomon functionality can upgrade incrementally:
-
-```rust
-// Before: Basic FEC
-let rs = ReedSolomon::new(4, 2)?;
-let shards = rs.encode(&data)?;
-
-// After: Enhanced storage (backward compatible)
-let rs = ReedSolomon::new(4, 2)?;
-let shards = rs.encode(&data)?;
-
-// Or: Full encrypted storage
-let pipeline = StoragePipeline::new(Config::default(), storage).await?;
-let metadata = pipeline.process_file(file_id, &data, None).await?;
-```
-
-## Roadmap
-
-### Current (v0.2.x)
-- ✅ Convergent encryption with multiple modes
-- ✅ Comprehensive metadata management
-- ✅ Storage backend abstraction
-- ✅ Integrated processing pipeline
-- ✅ Garbage collection system
-
-### Near Term (v0.3.x)
-- 🚧 Network storage backend
-- 🚧 Advanced replication strategies
-- 🚧 Performance optimizations
-- 🚧 Extended monitoring and metrics
-
-### Medium Term (v0.4.x)
-- 📋 Distributed consensus protocols
-- 📋 Cross-platform hardware acceleration
-- 📋 Advanced compression algorithms
-- 📋 REST API and CLI tools
-
-### Long Term (v1.0+)
-- 📋 Formal verification of critical components
-- 📋 Hardware security module integration
-- 📋 Advanced threat protection
-- 📋 Ecosystem integrations
-
-## Independence
-
-This crate is completely standalone:
-- No runtime or build-time dependency on any Saorsa components
-- No coupling to the Saorsa network; suitable for any Rust application
-- Self-contained with minimal external dependencies
 
 ## License
 
@@ -421,14 +188,4 @@ Licensed under the GNU Affero General Public License v3.0 or later.
 
 ## Contributing
 
-Contributions are welcome! Please read our contributing guidelines and ensure:
-- All tests pass (`cargo test --all-features`)
-- Code follows our quality standards (no unwrap/panic patterns)
-- Documentation is updated for new features
-- Security considerations are addressed
-
-Open issues and pull requests on the [repository](https://github.com/dirvine/saorsa-fec).
-
----
-
-**Saorsa FEC**: From basic erasure coding to complete encrypted storage solution. Secure, efficient, and production-ready.
+Contributions welcome! Please open issues and pull requests.
