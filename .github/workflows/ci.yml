@@ -84,7 +84,7 @@ jobs:
         key: ${{ runner.os }}-cargo-bench-${{ hashFiles('**/Cargo.lock') }}
     
     - name: Run benchmarks
-      run: cargo bench --features bench
+      run: cargo bench --features pure-rust
 
   security:
     name: Security Audit
