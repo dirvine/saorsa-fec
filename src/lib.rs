@@ -17,9 +17,18 @@ use std::fmt;
 use thiserror::Error;
 
 pub mod backends;
+pub mod chunk_registry;
+pub mod config;
+pub mod crypto;
+pub mod gc;
 pub mod gf256;
 pub mod ida;
+pub mod metadata;
+pub mod pipeline;
+pub mod storage;
 pub mod traits;
+pub mod types;
+pub mod version;
 
 pub use ida::{IDAConfig, IDADescriptor, ShareMetadata};
 pub use traits::{Fec, FecBackend};
