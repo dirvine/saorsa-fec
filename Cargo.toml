@@ -1,10 +1,10 @@
 [package]
 name = "saorsa-fec"
-version = "0.2.3"
+version = "0.3.0"
 edition = "2024"
 authors = ["Saorsa Developers <dev@saorsa.net>"]
 license = "AGPL-3.0"
-description = "Patent-free erasure coding using systematic Reed-Solomon"
+description = "Quantum-safe erasure coding with post-quantum cryptography using saorsa-pqc"
 repository = "https://github.com/dirvine/saorsa-fec"
 homepage = "https://github.com/dirvine/saorsa-fec"
 documentation = "https://docs.rs/saorsa-fec"

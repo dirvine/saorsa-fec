@@ -5,16 +5,16 @@
 //! the previous crypto module with quantum-safe alternatives.
 
 use anyhow::{Context, Result};
+use blake3::Hasher;
+use generic_array::GenericArray;
+use hkdf::Hkdf;
 use saorsa_pqc::api::{
     kem::ml_kem_768,
     symmetric::{ChaCha20Poly1305, generate_nonce},
 };
-use generic_array::GenericArray;
 use serde::{Deserialize, Serialize};
-use zeroize::{Zeroize, ZeroizeOnDrop};
-use blake3::Hasher;
-use hkdf::Hkdf;
 use sha2::Sha256;
+use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use crate::config::EncryptionMode;
 
@@ -113,17 +113,13 @@ impl QuantumCryptoEngine {
         convergence_secret: Option<&ConvergenceSecret>,
     ) -> Result<(Vec<u8>, QuantumEncryptionMetadata)> {
         match mode {
-            EncryptionMode::Convergent => {
-                self.encrypt_convergent(data, None)
-            }
+            EncryptionMode::Convergent => self.encrypt_convergent(data, None),
             EncryptionMode::ConvergentWithSecret => {
                 let secret = convergence_secret
                     .context("Convergence secret required for ConvergentWithSecret mode")?;
                 self.encrypt_convergent(data, Some(secret))
             }
-            EncryptionMode::RandomKey => {
-                self.encrypt_random_key(data)
-            }
+            EncryptionMode::RandomKey => self.encrypt_random_key(data),
         }
     }
 
@@ -157,7 +153,7 @@ impl QuantumCryptoEngine {
     ) -> Result<(Vec<u8>, QuantumEncryptionMetadata)> {
         // Derive deterministic key from content
         let key_bytes = self.derive_convergent_key(data, secret)?;
-        
+
         // Generate deterministic nonce for convergent encryption
         let nonce = self.generate_deterministic_nonce(data, secret.map(|s| s.as_bytes()))?;
         self.last_nonce = Some(nonce);
@@ -177,19 +173,18 @@ impl QuantumCryptoEngine {
         Ok((ciphertext, metadata))
     }
 
-    fn encrypt_random_key(
-        &mut self,
-        data: &[u8],
-    ) -> Result<(Vec<u8>, QuantumEncryptionMetadata)> {
+    fn encrypt_random_key(&mut self, data: &[u8]) -> Result<(Vec<u8>, QuantumEncryptionMetadata)> {
         // Create ML-KEM instance
         let kem = ml_kem_768();
-        
+
         // Generate keypair
-        let (public_key, _secret_key) = kem.generate_keypair()
+        let (public_key, _secret_key) = kem
+            .generate_keypair()
             .map_err(|e| anyhow::anyhow!("KEM keypair generation failed: {:?}", e))?;
 
         // Encapsulate to get shared secret
-        let (shared_secret, ciphertext) = kem.encapsulate(&public_key)
+        let (shared_secret, ciphertext) = kem
+            .encapsulate(&public_key)
             .map_err(|e| anyhow::anyhow!("KEM encapsulation failed: {:?}", e))?;
 
         // Derive ChaCha20 key from shared secret - need to convert to [u8; 32]
@@ -226,8 +221,7 @@ impl QuantumCryptoEngine {
         original_data: Option<&[u8]>,
     ) -> Result<Vec<u8>> {
         // For convergent encryption, we need the original data to derive the key
-        let data = original_data
-            .context("Original data required for convergent decryption")?;
+        let data = original_data.context("Original data required for convergent decryption")?;
 
         let secret = if metadata.convergence_secret_id.is_some() {
             convergence_secret
@@ -251,7 +245,6 @@ impl QuantumCryptoEngine {
         anyhow::bail!("Random key decryption requires stored decapsulation key")
     }
 
-
     fn derive_convergent_key(
         &self,
         content: &[u8],
@@ -260,11 +253,11 @@ impl QuantumCryptoEngine {
         // Use Blake3 for quantum-safe content hashing
         let mut hasher = Hasher::new();
         hasher.update(content);
-        
+
         if let Some(s) = secret {
             hasher.update(s.as_bytes());
         }
-        
+
         let content_hash = hasher.finalize();
 
         // Use HKDF for proper key derivation
@@ -289,10 +282,10 @@ impl QuantumCryptoEngine {
         // Convert [u8; 32] to GenericArray for ChaCha20Poly1305
         let key_array = GenericArray::from_slice(key);
         let cipher = ChaCha20Poly1305::new(key_array);
-        
+
         // Convert [u8; 12] to GenericArray for nonce
         let nonce_array = GenericArray::from_slice(nonce);
-        
+
         let ciphertext = cipher
             .encrypt(nonce_array, data)
             .map_err(|e| anyhow::anyhow!("ChaCha20Poly1305 encryption failed: {:?}", e))?;
@@ -305,13 +298,18 @@ impl QuantumCryptoEngine {
         Ok(result)
     }
 
-    fn chacha20_decrypt(&self, encrypted_data: &[u8], key: &[u8; 32], nonce: &[u8; 12]) -> Result<Vec<u8>> {
+    fn chacha20_decrypt(
+        &self,
+        encrypted_data: &[u8],
+        key: &[u8; 32],
+        nonce: &[u8; 12],
+    ) -> Result<Vec<u8>> {
         if encrypted_data.len() < 12 {
             anyhow::bail!("Encrypted data too short to contain nonce");
         }
 
         let (data_nonce, ciphertext) = encrypted_data.split_at(12);
-        
+
         // Verify nonce matches
         if data_nonce != nonce {
             anyhow::bail!("Nonce mismatch in encrypted data");
@@ -340,11 +338,11 @@ impl QuantumCryptoEngine {
         let mut hasher = Hasher::new();
         hasher.update(b"nonce-derivation");
         hasher.update(content);
-        
+
         if let Some(s) = secret {
             hasher.update(s);
         }
-        
+
         let hash = hasher.finalize();
         let mut nonce = [0u8; 12];
         nonce.copy_from_slice(&hash.as_bytes()[..12]);
@@ -359,10 +357,6 @@ impl QuantumCryptoEngine {
         let hash = hasher.finalize();
         *hash.as_bytes()
     }
-
-    
-
-    
 }
 
 #[cfg(test)]
@@ -376,9 +370,12 @@ mod tests {
 
         // Encrypt with convergent mode
         let (encrypted, metadata) = engine.encrypt(data, EncryptionMode::Convergent, None)?;
-        
+
         // Verify metadata
-        assert!(matches!(metadata.key_derivation, QuantumKeyDerivation::Blake3Convergent));
+        assert!(matches!(
+            metadata.key_derivation,
+            QuantumKeyDerivation::Blake3Convergent
+        ));
         assert!(metadata.convergence_secret_id.is_none());
 
         // Decrypt
@@ -388,7 +385,7 @@ mod tests {
         // Verify deterministic behavior
         let mut engine2 = QuantumCryptoEngine::new();
         let (encrypted2, metadata2) = engine2.encrypt(data, EncryptionMode::Convergent, None)?;
-        
+
         // Same data should produce same result
         assert_eq!(encrypted, encrypted2);
         assert_eq!(metadata.nonce, metadata2.nonce);
@@ -403,14 +400,14 @@ mod tests {
         let secret = ConvergenceSecret::new([42u8; 32]);
 
         // Encrypt with secret
-        let (encrypted, metadata) = engine.encrypt(
-            data, 
-            EncryptionMode::ConvergentWithSecret, 
-            Some(&secret)
-        )?;
+        let (encrypted, metadata) =
+            engine.encrypt(data, EncryptionMode::ConvergentWithSecret, Some(&secret))?;
 
         // Verify metadata
-        assert!(matches!(metadata.key_derivation, QuantumKeyDerivation::Blake3Convergent));
+        assert!(matches!(
+            metadata.key_derivation,
+            QuantumKeyDerivation::Blake3Convergent
+        ));
         assert!(metadata.convergence_secret_id.is_some());
 
         // Decrypt
@@ -420,12 +417,9 @@ mod tests {
         // Different secret should produce different result
         let secret2 = ConvergenceSecret::new([24u8; 32]);
         let mut engine2 = QuantumCryptoEngine::new();
-        let (encrypted2, _) = engine2.encrypt(
-            data, 
-            EncryptionMode::ConvergentWithSecret, 
-            Some(&secret2)
-        )?;
-        
+        let (encrypted2, _) =
+            engine2.encrypt(data, EncryptionMode::ConvergentWithSecret, Some(&secret2))?;
+
         assert_ne!(encrypted, encrypted2);
 
         Ok(())
@@ -438,15 +432,18 @@ mod tests {
 
         // Encrypt with random key mode
         let (encrypted, metadata) = engine.encrypt(data, EncryptionMode::RandomKey, None)?;
-        
+
         // Verify metadata
-        assert!(matches!(metadata.key_derivation, QuantumKeyDerivation::QuantumRandom));
+        assert!(matches!(
+            metadata.key_derivation,
+            QuantumKeyDerivation::QuantumRandom
+        ));
         assert!(!metadata.encapsulated_secret.is_empty());
 
         // Random key mode should produce different results
         let mut engine2 = QuantumCryptoEngine::new();
         let (encrypted2, metadata2) = engine2.encrypt(data, EncryptionMode::RandomKey, None)?;
-        
+
         assert_ne!(encrypted, encrypted2);
         assert_ne!(metadata.nonce, metadata2.nonce);
         assert_ne!(metadata.encapsulated_secret, metadata2.encapsulated_secret);

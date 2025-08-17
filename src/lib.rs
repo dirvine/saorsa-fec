@@ -26,12 +26,12 @@ pub mod backends;
 pub mod chunk_registry;
 pub mod config;
 pub mod crypto;
-pub mod quantum_crypto;
 pub mod gc;
 pub mod gf256;
 pub mod ida;
 pub mod metadata;
 pub mod pipeline;
+pub mod quantum_crypto;
 pub mod storage;
 pub mod traits;
 pub mod types;
@@ -43,6 +43,7 @@ pub use traits::{Fec, FecBackend};
 // v0.3 API exports
 pub use config::{Config, EncryptionMode};
 pub use pipeline::{Meta, PipelineStats, StoragePipeline};
+pub use quantum_crypto::{QuantumCryptoEngine, QuantumEncryptionMetadata};
 pub use storage::{
     ChunkMeta, Cid, FileMetadata, GcReport, LocalStorage, MemoryStorage, MultiStorage,
     MultiStorageStrategy, NetworkStorage, NodeEndpoint, Shard, ShardHeader, StorageBackend,

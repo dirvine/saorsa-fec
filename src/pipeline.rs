@@ -11,9 +11,10 @@ use std::sync::Arc;
 use crate::chunk_registry::{ChunkInfo, ChunkRegistry};
 use crate::config::{Config, EncryptionMode};
 use crate::crypto::{
-    ConvergenceSecret, CryptoEngine, EncryptionKey, EncryptionMetadata, compute_secret_id,
+    CryptoEngine, EncryptionKey, EncryptionMetadata,
     derive_convergent_key, generate_random_key,
 };
+use crate::quantum_crypto::QuantumCryptoEngine;
 use crate::gc::GarbageCollector;
 use crate::ida::IDAConfig;
 use crate::metadata::{ChunkReference, FileMetadata, LocalMetadata};
@@ -134,8 +135,8 @@ impl<B: StorageBackend> StoragePipeline<B> {
         data: &[u8],
         meta: Option<Meta>,
     ) -> Result<FileMetadata> {
-        // Create crypto engine
-        let mut crypto = CryptoEngine::new();
+        // Create quantum crypto engine
+        let mut crypto = QuantumCryptoEngine::new();
 
         // Process data with optional compression
         let processed_data = if self.config.compression_enabled {
@@ -144,42 +145,23 @@ impl<B: StorageBackend> StoragePipeline<B> {
             data.to_vec()
         };
 
-        // Encrypt based on mode
-        let (encrypted_data, encryption_metadata) = match self.config.encryption_mode {
-            EncryptionMode::Convergent => {
-                let key = derive_convergent_key(&processed_data, None);
-                let encrypted = crypto.encrypt(&processed_data, &key)?;
-                let metadata = EncryptionMetadata {
-                    algorithm: crate::crypto::EncryptionAlgorithm::Aes256Gcm,
-                    key_derivation: crate::crypto::KeyDerivation::Blake3Convergent,
-                    convergence_secret_id: None,
-                    nonce: crypto.last_nonce(),
-                };
-                (encrypted, Some(metadata))
-            }
-            EncryptionMode::ConvergentWithSecret => {
-                let secret = self.get_user_secret()?;
-                let key = derive_convergent_key(&processed_data, Some(&secret));
-                let encrypted = crypto.encrypt(&processed_data, &key)?;
-                let metadata = EncryptionMetadata {
-                    algorithm: crate::crypto::EncryptionAlgorithm::Aes256Gcm,
-                    key_derivation: crate::crypto::KeyDerivation::Blake3Convergent,
-                    convergence_secret_id: Some(compute_secret_id(&ConvergenceSecret::new(secret))),
-                    nonce: crypto.last_nonce(),
-                };
-                (encrypted, Some(metadata))
-            }
-            EncryptionMode::RandomKey => {
-                let key = generate_random_key();
-                let encrypted = crypto.encrypt(&processed_data, &key)?;
-                let metadata = EncryptionMetadata {
-                    algorithm: crate::crypto::EncryptionAlgorithm::Aes256Gcm,
-                    key_derivation: crate::crypto::KeyDerivation::Random,
-                    convergence_secret_id: None,
-                    nonce: crypto.last_nonce(),
-                };
-                (encrypted, Some(metadata))
-            }
+        // Encrypt using quantum engine
+        let (encrypted_data, quantum_encryption_metadata) = {
+            let secret = match self.config.encryption_mode {
+                EncryptionMode::ConvergentWithSecret => {
+                    let secret_bytes = self.get_user_secret()?;
+                    Some(crate::quantum_crypto::ConvergenceSecret::new(secret_bytes))
+                }
+                _ => None,
+            };
+
+            let (encrypted, quantum_meta) = crypto.encrypt(
+                &processed_data,
+                self.config.encryption_mode,
+                secret.as_ref(),
+            )?;
+
+            (encrypted, Some(quantum_meta))
         };
 
         // Check for deduplication based on ciphertext + auth header
@@ -197,11 +179,11 @@ impl<B: StorageBackend> StoragePipeline<B> {
         // Process chunks with FEC encoding
         let chunk_refs = self.process_chunks(&encrypted_data, &data_id).await?;
 
-        // Create file metadata
-        let mut file_metadata = FileMetadata::new(
+        // Create file metadata with quantum encryption
+        let mut file_metadata = FileMetadata::with_quantum_encryption(
             file_id,
             data.len() as u64, // Original file size
-            encryption_metadata,
+            quantum_encryption_metadata,
             chunk_refs,
         );
 
@@ -243,8 +225,30 @@ impl<B: StorageBackend> StoragePipeline<B> {
         // Combine chunks (reconstruct with FEC if needed)
         let encrypted_data = self.reconstruct_data(&chunks, meta).await?;
 
-        // Decrypt
-        let decrypted = if let Some(enc_meta) = &meta.encryption_metadata {
+        // Decrypt using quantum engine
+        let decrypted = if let Some(quantum_meta) = &meta.quantum_encryption_metadata {
+            let crypto = QuantumCryptoEngine::new();
+            
+            // Get convergence secret if needed
+            let secret = if quantum_meta.convergence_secret_id.is_some() {
+                let secret_bytes = self.get_user_secret()?;
+                Some(crate::quantum_crypto::ConvergenceSecret::new(secret_bytes))
+            } else {
+                None
+            };
+
+            // Get original data for convergent decryption
+            let orig_storage = self.original_data_storage.read();
+            let original_data = orig_storage.get(&meta.file_id);
+
+            crypto.decrypt(
+                &encrypted_data,
+                quantum_meta,
+                secret.as_ref(),
+                original_data.map(|v| v.as_slice()),
+            )?
+        } else if let Some(enc_meta) = &meta.encryption_metadata {
+            // Legacy fallback
             let crypto = CryptoEngine::new();
             let key = self.recover_key(enc_meta, &meta.file_id)?;
             crypto.decrypt(&encrypted_data, &key)?
@@ -311,15 +315,15 @@ impl<B: StorageBackend> StoragePipeline<B> {
     /// Retrieve a chunk from storage
     async fn retrieve_chunk(&self, chunk_id: &[u8; 32]) -> Result<Vec<u8>> {
         let storage = self.chunk_storage.read();
-        
+
         // The chunk_id is actually the blake3 hash of the chunk data
         let chunk_key = hex::encode(chunk_id);
-        
+
         // Look up chunk by exact hash match
         if let Some(data) = storage.get(&chunk_key) {
             return Ok(data.clone());
         }
-        
+
         anyhow::bail!("Chunk not found: {}", chunk_key)
     }
 
@@ -348,9 +352,10 @@ impl<B: StorageBackend> StoragePipeline<B> {
             crate::crypto::KeyDerivation::Blake3Convergent => {
                 // Get original data from storage
                 let orig_storage = self.original_data_storage.read();
-                let original_data = orig_storage.get(file_id)
+                let original_data = orig_storage
+                    .get(file_id)
                     .ok_or_else(|| anyhow::anyhow!("Original data not found for file"))?;
-                
+
                 let secret = if metadata.convergence_secret_id.is_some() {
                     Some(self.get_user_secret()?)
                 } else {

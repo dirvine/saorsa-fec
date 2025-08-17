@@ -18,6 +18,7 @@ pub enum EncryptionMode {
     RandomKey,
 }
 
+
 /// Main configuration for the Saorsa FEC system
 /// Supports builder pattern as specified in v0.3
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -72,6 +73,7 @@ impl Config {
         self.encryption_mode = mode;
         self
     }
+
 
     /// Set FEC parameters (v0.3 builder pattern)
     /// overhead = parity_shards / data_shards

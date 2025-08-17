@@ -10,6 +10,7 @@ use std::collections::HashSet;
 use std::path::PathBuf;
 
 use crate::crypto::EncryptionMetadata;
+use crate::quantum_crypto::QuantumEncryptionMetadata;
 
 /// File metadata containing all deterministic information
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -18,8 +19,10 @@ pub struct FileMetadata {
     pub file_id: [u8; 32],
     /// Size of original file in bytes
     pub file_size: u64,
-    /// Encryption metadata if file is encrypted
+    /// Encryption metadata if file is encrypted (legacy format)
     pub encryption_metadata: Option<EncryptionMetadata>,
+    /// Quantum encryption metadata
+    pub quantum_encryption_metadata: Option<QuantumEncryptionMetadata>,
     /// References to all chunks comprising this file
     pub chunks: Vec<ChunkReference>,
     /// Parent version hash for version tracking
@@ -30,7 +33,7 @@ pub struct FileMetadata {
 }
 
 impl FileMetadata {
-    /// Create new file metadata
+    /// Create new file metadata (legacy constructor)
     pub fn new(
         file_id: [u8; 32],
         file_size: u64,
@@ -41,6 +44,25 @@ impl FileMetadata {
             file_id,
             file_size,
             encryption_metadata,
+            quantum_encryption_metadata: None,
+            chunks,
+            parent_version: None,
+            local_metadata: None,
+        }
+    }
+
+    /// Create new file metadata with quantum encryption support
+    pub fn with_quantum_encryption(
+        file_id: [u8; 32],
+        file_size: u64,
+        quantum_encryption_metadata: Option<QuantumEncryptionMetadata>,
+        chunks: Vec<ChunkReference>,
+    ) -> Self {
+        Self {
+            file_id,
+            file_size,
+            encryption_metadata: None,
+            quantum_encryption_metadata,
             chunks,
             parent_version: None,
             local_metadata: None,
