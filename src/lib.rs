@@ -26,6 +26,7 @@ pub mod backends;
 pub mod chunk_registry;
 pub mod config;
 pub mod crypto;
+pub mod quantum_crypto;
 pub mod gc;
 pub mod gf256;
 pub mod ida;
@@ -40,7 +41,7 @@ pub use ida::{IDAConfig, IDADescriptor, ShareMetadata};
 pub use traits::{Fec, FecBackend};
 
 // v0.3 API exports
-pub use config::EncryptionMode;
+pub use config::{Config, EncryptionMode};
 pub use pipeline::{Meta, PipelineStats, StoragePipeline};
 pub use storage::{
     ChunkMeta, Cid, FileMetadata, GcReport, LocalStorage, MemoryStorage, MultiStorage,
