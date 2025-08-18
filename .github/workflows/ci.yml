@@ -8,18 +8,28 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  RUSTFLAGS: "-D warnings"
+  RUSTFLAGS: "-D warnings -W clippy::all -W clippy::pedantic -W clippy::nursery"
 
 jobs:
   test:
     name: Test Suite
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        rust-version: [stable]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        rust-version: [1.70.0, stable, beta]
+        features: ["", "pure-rust", "isa-l"]
+        exclude:
+          # ISA-L is only available on x86_64 Linux
+          - os: macos-latest
+            features: "isa-l"
+          - os: windows-latest
+            features: "isa-l"
     
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
     
     - name: Install Rust ${{ matrix.rust-version }}
       uses: dtolnay/rust-toolchain@master
@@ -34,34 +44,192 @@ jobs:
           ~/.cargo/registry
           ~/.cargo/git
           target
-        key: ${{ runner.os }}-cargo-${{ matrix.rust-version }}-${{ hashFiles('**/Cargo.lock') }}
+        key: ${{ runner.os }}-cargo-${{ matrix.rust-version }}-${{ matrix.features }}-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-${{ matrix.rust-version }}-
+          ${{ runner.os }}-cargo-
     
-    - name: Check formatting
+    - name: Check formatting (stable only)
+      if: matrix.rust-version == 'stable' && matrix.os == 'ubuntu-latest'
       run: cargo fmt --all -- --check
     
-    - name: Clippy linting
-      run: cargo clippy --all-targets --features pure-rust -- -D warnings
+    - name: Check for forbidden patterns
+      if: matrix.rust-version == 'stable' && matrix.os == 'ubuntu-latest'
+      run: |
+        echo "Checking for forbidden patterns in production code..."
+        EXIT_CODE=0
+        
+        # Check for unwrap() in production code (tests are OK)
+        if find src/ -name "*.rs" -not -path "*/tests/*" -exec grep -l "\.unwrap()" {} \; | head -1; then
+          echo "::error::Found .unwrap() in production code:"
+          find src/ -name "*.rs" -not -path "*/tests/*" -exec grep -Hn "\.unwrap()" {} \;
+          EXIT_CODE=1
+        fi
+        
+        # Check for expect() in production code (tests are OK)
+        if find src/ -name "*.rs" -not -path "*/tests/*" -exec grep -l "\.expect(" {} \; | head -1; then
+          echo "::error::Found .expect() in production code:"
+          find src/ -name "*.rs" -not -path "*/tests/*" -exec grep -Hn "\.expect(" {} \;
+          EXIT_CODE=1
+        fi
+        
+        # Check for panic! in production code (tests are OK)
+        if find src/ -name "*.rs" -not -path "*/tests/*" -exec grep -l "panic!" {} \; | head -1; then
+          echo "::error::Found panic! in production code:"
+          find src/ -name "*.rs" -not -path "*/tests/*" -exec grep -Hn "panic!" {} \;
+          EXIT_CODE=1
+        fi
+        
+        # Check for todo! and unimplemented!
+        if find src/ -name "*.rs" -exec grep -l -E "(todo!|unimplemented!)" {} \; | head -1; then
+          echo "::error::Found incomplete implementations:"
+          find src/ -name "*.rs" -exec grep -Hn -E "(todo!|unimplemented!)" {} \;
+          EXIT_CODE=1
+        fi
+        
+        if [ $EXIT_CODE -eq 0 ]; then
+          echo "✅ No forbidden patterns found"
+        fi
+        
+        exit $EXIT_CODE
     
-    - name: Build (no features)
-      run: cargo build --verbose
+    - name: Clippy linting (ultra-strict)
+      run: |
+        if [ "${{ matrix.features }}" = "" ]; then
+          cargo clippy --all-targets -- -D warnings -D clippy::all -D clippy::pedantic
+        else
+          cargo clippy --all-targets --features "${{ matrix.features }}" -- -D warnings -D clippy::all -D clippy::pedantic
+        fi
     
-    - name: Build (pure-rust features)
-      run: cargo build --features pure-rust --verbose
+    - name: Build with features
+      run: |
+        if [ "${{ matrix.features }}" = "" ]; then
+          cargo build --verbose
+        else
+          cargo build --features "${{ matrix.features }}" --verbose
+        fi
     
-    - name: Run tests
-      run: cargo test --lib --features pure-rust --verbose
+    - name: Run unit tests
+      run: |
+        if [ "${{ matrix.features }}" = "" ]; then
+          cargo test --lib --verbose
+        else
+          cargo test --lib --features "${{ matrix.features }}" --verbose
+        fi
+    
+    - name: Run integration tests
+      run: |
+        if [ "${{ matrix.features }}" = "" ]; then
+          cargo test --test '*' --verbose
+        else
+          cargo test --test '*' --features "${{ matrix.features }}" --verbose
+        fi
     
     - name: Run doctests
-      run: cargo test --doc --features pure-rust
+      run: |
+        if [ "${{ matrix.features }}" = "" ]; then
+          cargo test --doc
+        else
+          cargo test --doc --features "${{ matrix.features }}"
+        fi
     
     - name: Run examples
-      if: ${{ hashFiles('examples/*.rs') != '' }}
+      if: matrix.rust-version == 'stable'
+      shell: bash
       run: |
-        shopt -s nullglob
-        for example in examples/*.rs; do
-          ex=$(basename "$example" .rs)
-          cargo run --example "$ex"
-        done
+        if [ "${{ runner.os }}" = "Windows" ]; then
+          # Windows doesn't have nullglob, use different approach
+          for example in examples/*.rs; do
+            if [ -f "$example" ]; then
+              ex=$(basename "$example" .rs)
+              if [ "${{ matrix.features }}" = "" ]; then
+                cargo run --example "$ex"
+              else
+                cargo run --example "$ex" --features "${{ matrix.features }}"
+              fi
+            fi
+          done
+        else
+          shopt -s nullglob
+          for example in examples/*.rs; do
+            ex=$(basename "$example" .rs)
+            if [ "${{ matrix.features }}" = "" ]; then
+              cargo run --example "$ex"
+            else
+              cargo run --example "$ex" --features "${{ matrix.features }}"
+            fi
+          done
+        fi
+
+  wasm:
+    name: WASM Compilation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install Rust stable
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: wasm32-unknown-unknown
+    
+    - name: Cache Cargo registry
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-wasm-${{ hashFiles('**/Cargo.lock') }}
+    
+    - name: Check WASM compilation
+      run: cargo check --target wasm32-unknown-unknown --features pure-rust
+
+  minimal-versions:
+    name: Minimal Versions Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install Rust nightly
+      uses: dtolnay/rust-toolchain@nightly
+    
+    - name: Install cargo-hack and cargo-minimal-versions
+      run: |
+        cargo install cargo-hack cargo-minimal-versions --locked
+    
+    - name: Check minimal versions
+      run: cargo minimal-versions check --features pure-rust
+
+  no-std:
+    name: no_std Compatibility
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install Rust stable
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: thumbv7em-none-eabihf
+    
+    - name: Cache Cargo registry
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-nostd-${{ hashFiles('**/Cargo.lock') }}
+    
+    - name: Check no_std compilation (if supported)
+      run: |
+        # This is a placeholder - implement if the crate supports no_std
+        echo "no_std check would go here if supported"
 
   benchmark:
     name: Benchmarks

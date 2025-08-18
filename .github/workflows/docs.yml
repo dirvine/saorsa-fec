@@ -1,0 +1,403 @@
+name: Documentation
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [published]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-docs:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Install Rust stable
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Cache Cargo registry
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: docs-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Build API documentation
+      run: |
+        cargo doc --features pure-rust --no-deps --document-private-items
+        
+        # Check for documentation warnings and fail if any exist
+        cargo doc --features pure-rust 2>&1 | tee doc-warnings.log
+        if grep -q "warning:" doc-warnings.log; then
+          echo "::error::Documentation warnings found:"
+          cat doc-warnings.log
+          exit 1
+        fi
+
+    - name: Check documentation coverage
+      run: |
+        # Install documentation coverage tool if available
+        cargo install cargo-doc-coverage --locked || true
+        
+        # Generate coverage report
+        if command -v cargo-doc-coverage &> /dev/null; then
+          cargo doc-coverage --features pure-rust --output-format json > doc-coverage.json
+          
+          # Extract coverage percentage
+          COVERAGE=$(jq -r '.coverage_percentage // 0' doc-coverage.json)
+          echo "Documentation coverage: ${COVERAGE}%"
+          
+          # Require minimum 80% documentation coverage
+          if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+            echo "::error::Documentation coverage (${COVERAGE}%) is below required 80%"
+            exit 1
+          fi
+        else
+          echo "::warning::cargo-doc-coverage not available, skipping coverage check"
+        fi
+
+    - name: Validate code examples in documentation
+      run: |
+        echo "Testing code examples in documentation..."
+        cargo test --doc --features pure-rust
+
+    - name: Generate documentation index
+      run: |
+        # Create a simple index.html that redirects to the crate docs
+        mkdir -p target/doc-output
+        cat > target/doc-output/index.html << 'EOF'
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <title>saorsa-fec Documentation</title>
+            <meta http-equiv="refresh" content="0; URL=saorsa_fec/index.html">
+            <style>
+                body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+                .container { max-width: 600px; margin: 0 auto; }
+                .logo { font-size: 2em; color: #333; margin-bottom: 20px; }
+                .description { color: #666; margin-bottom: 30px; }
+                .redirect-link { color: #0066cc; text-decoration: none; font-weight: bold; }
+                .redirect-link:hover { text-decoration: underline; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="logo">📚 saorsa-fec</div>
+                <div class="description">
+                    Quantum-safe erasure coding with post-quantum cryptography
+                </div>
+                <p>Redirecting to documentation...</p>
+                <p>If you are not redirected automatically, 
+                   <a href="saorsa_fec/index.html" class="redirect-link">click here</a>
+                </p>
+            </div>
+        </body>
+        </html>
+        EOF
+        
+        # Copy the generated docs
+        cp -r target/doc/* target/doc-output/
+
+    - name: Upload documentation artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: documentation
+        path: target/doc-output/
+
+  deploy-docs:
+    name: Deploy Documentation
+    runs-on: ubuntu-latest
+    needs: build-docs
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+
+    - name: Download documentation
+      uses: actions/download-artifact@v4
+      with:
+        name: documentation
+        path: docs
+
+    - name: Upload to GitHub Pages
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: docs
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
+
+  validate-readme:
+    name: Validate README and Documentation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install markdown linter
+      run: |
+        npm install -g markdownlint-cli
+
+    - name: Lint markdown files
+      run: |
+        # Create markdownlint config
+        cat > .markdownlint.json << 'EOF'
+        {
+          "MD013": false,
+          "MD033": false,
+          "MD041": false
+        }
+        EOF
+        
+        # Lint README and documentation
+        markdownlint README.md docs/ || true
+
+    - name: Check README sections
+      run: |
+        echo "Validating README.md structure..."
+        
+        required_sections=(
+          "Installation"
+          "Usage"
+          "Examples"
+          "Features"
+          "License"
+        )
+        
+        missing_sections=()
+        for section in "${required_sections[@]}"; do
+          if ! grep -q "## $section" README.md; then
+            missing_sections+=("$section")
+          fi
+        done
+        
+        if [ ${#missing_sections[@]} -gt 0 ]; then
+          echo "::warning::Missing recommended README sections:"
+          printf '%s\n' "${missing_sections[@]}"
+        else
+          echo "✅ All recommended README sections found"
+        fi
+
+    - name: Check code examples in README
+      run: |
+        echo "Extracting and validating code examples from README..."
+        
+        # Extract Rust code blocks from README
+        awk '/```rust/,/```/' README.md | grep -v '```' > readme_examples.rs || true
+        
+        if [ -s readme_examples.rs ]; then
+          echo "Found Rust examples in README, validating syntax..."
+          
+          # Create a simple test file to check syntax
+          cat > test_readme_examples.rs << 'EOF'
+        use saorsa_fec::*;
+        
+        fn main() {
+        EOF
+          cat readme_examples.rs >> test_readme_examples.rs
+          echo "}" >> test_readme_examples.rs
+          
+          # Check if the examples compile (basic syntax check)
+          rustc --edition 2021 --crate-type bin test_readme_examples.rs -o /dev/null --extern saorsa_fec=target/debug/deps/libsaorsa_fec.rlib 2>/dev/null || {
+            echo "::warning::README code examples may have syntax issues"
+          }
+        else
+          echo "::warning::No Rust code examples found in README"
+        fi
+
+    - name: Validate links in documentation
+      run: |
+        echo "Checking for broken links in documentation..."
+        
+        # Install link checker
+        npm install -g markdown-link-check
+        
+        # Check README links
+        markdown-link-check README.md --config .github/link-check-config.json || true
+        
+        # Check documentation links
+        find docs/ -name "*.md" -exec markdown-link-check {} \; || true
+
+    - name: Create link check config
+      run: |
+        mkdir -p .github
+        cat > .github/link-check-config.json << 'EOF'
+        {
+          "ignorePatterns": [
+            {
+              "pattern": "^http://localhost"
+            },
+            {
+              "pattern": "^https://localhost"
+            },
+            {
+              "pattern": "^file://"
+            }
+          ],
+          "timeout": "10s",
+          "retryOn429": true,
+          "retryCount": 3,
+          "fallbackRetryDelay": "30s",
+          "aliveStatusCodes": [200, 206]
+        }
+        EOF
+
+  check-docs-coverage:
+    name: Documentation Coverage Report
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust stable
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Cache Cargo registry
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: docs-coverage-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Generate documentation coverage report
+      run: |
+        # Install cargo-doc-coverage
+        cargo install cargo-doc-coverage --locked || {
+          echo "::warning::cargo-doc-coverage not available, generating manual report"
+          
+          # Manual documentation coverage check
+          echo "Checking documentation coverage manually..."
+          
+          # Find all public items
+          PUBLIC_ITEMS=$(grep -r "pub " src/ --include="*.rs" | wc -l)
+          
+          # Find items with documentation (starting with ///)
+          DOCUMENTED_ITEMS=$(grep -r "/// " src/ --include="*.rs" | wc -l)
+          
+          if [ $PUBLIC_ITEMS -gt 0 ]; then
+            COVERAGE=$((DOCUMENTED_ITEMS * 100 / PUBLIC_ITEMS))
+            echo "Estimated documentation coverage: ${COVERAGE}% (${DOCUMENTED_ITEMS}/${PUBLIC_ITEMS})"
+            
+            if [ $COVERAGE -lt 80 ]; then
+              echo "::warning::Documentation coverage may be below 80%"
+            fi
+          fi
+          
+          exit 0
+        }
+        
+        # Generate detailed coverage report
+        cargo doc-coverage --features pure-rust --output-format json > coverage.json
+        cargo doc-coverage --features pure-rust --output-format markdown > coverage.md
+        
+        # Extract coverage percentage
+        COVERAGE=$(jq -r '.coverage_percentage // 0' coverage.json)
+        echo "Documentation coverage: ${COVERAGE}%"
+        
+        # Post coverage as a comment on PR (if applicable)
+        if [ -f coverage.md ]; then
+          echo "## 📚 Documentation Coverage Report" > comment.md
+          echo "" >> comment.md
+          cat coverage.md >> comment.md
+        fi
+
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: documentation-coverage
+        path: |
+          coverage.json
+          coverage.md
+          comment.md
+      if: always()
+
+  spell-check:
+    name: Spell Check Documentation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install spell checker
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y aspell aspell-en
+
+    - name: Create spell check dictionary
+      run: |
+        # Create custom dictionary for technical terms
+        cat > .aspell.en.pws << 'EOF'
+        personal_ws-1.1 en 0 utf-8
+        saorsa
+        fec
+        erasure
+        cryptography
+        pqc
+        WASM
+        rustdoc
+        crates
+        Rust
+        GitHub
+        API
+        APIs
+        async
+        bool
+        enum
+        struct
+        impl
+        tokio
+        serde
+        EOF
+
+    - name: Spell check documentation
+      run: |
+        echo "Running spell check on documentation..."
+        
+        # Check README
+        aspell --personal=.aspell.en.pws --lang=en --mode=markdown list < README.md | sort -u > spelling_errors.txt || true
+        
+        # Check documentation files
+        find docs/ -name "*.md" -exec aspell --personal=.aspell.en.pws --lang=en --mode=markdown list {} \; | sort -u >> spelling_errors.txt || true
+        
+        if [ -s spelling_errors.txt ]; then
+          echo "::warning::Potential spelling errors found:"
+          cat spelling_errors.txt
+          echo "Please review these words and add them to .aspell.en.pws if they are correct technical terms"
+        else
+          echo "✅ No spelling errors found"
+        fi
+
+    - name: Upload spell check results
+      uses: actions/upload-artifact@v4
+      with:
+        name: spell-check-results
+        path: spelling_errors.txt
+      if: always()

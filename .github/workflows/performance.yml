@@ -1,0 +1,298 @@
+name: Performance Testing
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run performance tests weekly on Sundays at 03:00 UTC
+    - cron: '0 3 * * 0'
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: "-C target-cpu=native"
+
+jobs:
+  benchmark:
+    name: Performance Benchmarks
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        features: ["pure-rust", "isa-l"]
+        exclude:
+          # ISA-L is only available on x86_64 Linux
+          - os: macos-latest
+            features: "isa-l"
+          - os: windows-latest
+            features: "isa-l"
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Install Rust stable
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Cache Cargo registry
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-bench-${{ matrix.features }}-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Install critcmp for benchmark comparison
+      run: cargo install critcmp --locked
+
+    - name: Run benchmarks
+      run: |
+        cargo bench --features ${{ matrix.features }} -- --output-format json | tee benchmark-results.json
+
+    - name: Store benchmark results
+      uses: benchmark-action/github-action-benchmark@v1
+      with:
+        tool: 'cargo'
+        output-file-path: benchmark-results.json
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        auto-push: true
+        comment-on-alert: true
+        alert-threshold: '105%'  # Alert if performance degrades by 5%
+        fail-on-alert: true
+        benchmark-data-dir-path: 'dev/bench'
+
+    - name: Upload benchmark results as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: benchmark-results-${{ matrix.os }}-${{ matrix.features }}
+        path: benchmark-results.json
+
+  memory-profiling:
+    name: Memory Profiling
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust stable
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Install Valgrind
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y valgrind
+
+    - name: Cache Cargo registry
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-memory-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Build with debug info
+      run: cargo build --features pure-rust
+
+    - name: Run memory leak detection
+      run: |
+        # Run a simple test under Valgrind to check for memory leaks
+        valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes \
+          --error-exitcode=1 --suppressions=.valgrind.supp \
+          cargo test --features pure-rust --lib memory 2>&1 | tee valgrind.log || true
+        
+        # Check if there were any definite leaks
+        if grep -q "definitely lost" valgrind.log; then
+          echo "::error::Memory leaks detected!"
+          cat valgrind.log
+          exit 1
+        fi
+
+  stress-testing:
+    name: Stress Testing
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust stable
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Cache Cargo registry
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-stress-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Build release binary
+      run: cargo build --release --features pure-rust
+
+    - name: Run stress tests
+      run: |
+        echo "Running stress tests for extended period..."
+        
+        # Run property tests with more iterations
+        cargo test --release --features pure-rust property_tests -- --test-threads=1
+        
+        # Run performance test example for stress testing
+        timeout 900 cargo run --release --example performance_test --features pure-rust || true
+
+    - name: Monitor resource usage
+      run: |
+        # Monitor system resources during the test
+        echo "System information:"
+        free -h
+        df -h
+        nproc
+
+  performance-regression:
+    name: Performance Regression Detection
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout PR code
+      uses: actions/checkout@v4
+
+    - name: Install Rust stable
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Cache Cargo registry
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-regression-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Run PR benchmarks
+      run: |
+        cargo bench --features pure-rust -- --output-format json | tee pr-benchmarks.json
+
+    - name: Checkout main branch
+      run: |
+        git fetch origin main
+        git checkout main
+
+    - name: Run main branch benchmarks
+      run: |
+        cargo bench --features pure-rust -- --output-format json | tee main-benchmarks.json
+
+    - name: Install critcmp
+      run: cargo install critcmp --locked
+
+    - name: Compare performance
+      run: |
+        echo "Comparing performance between main and PR..."
+        critcmp main-benchmarks.json pr-benchmarks.json > comparison.txt
+        cat comparison.txt
+        
+        # Check for significant regressions (>10% slower)
+        if critcmp --threshold 10 main-benchmarks.json pr-benchmarks.json; then
+          echo "::warning::Potential performance regression detected!"
+          echo "Please review the benchmark comparison above."
+        else
+          echo "✅ No significant performance regressions detected"
+        fi
+
+    - name: Upload comparison results
+      uses: actions/upload-artifact@v4
+      with:
+        name: performance-comparison
+        path: |
+          comparison.txt
+          pr-benchmarks.json
+          main-benchmarks.json
+
+  constant-time-verification:
+    name: Constant-Time Verification
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust stable
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Cache Cargo registry
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-ctverif-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Verify constant-time operations
+      run: |
+        echo "Checking for constant-time implementations in cryptographic code..."
+        
+        # Look for potentially non-constant-time operations in crypto modules
+        if find src/ -name "*.rs" -path "*crypto*" -exec grep -Hn -E "(\.cmp\(|\.eq\(|==|!=)" {} \; | grep -v test; then
+          echo "::warning::Found potentially non-constant-time comparisons in crypto code"
+          echo "Please verify these use constant-time implementations from the 'subtle' crate"
+        else
+          echo "✅ No obvious non-constant-time operations found in crypto code"
+        fi
+        
+        # Check that we're using the 'subtle' crate for constant-time operations
+        if grep -r "subtle::" src/ | grep -v test; then
+          echo "✅ Found usage of 'subtle' crate for constant-time operations"
+        else
+          echo "::warning::Consider using 'subtle' crate for constant-time operations in crypto code"
+        fi
+
+  cross-platform-performance:
+    name: Cross-Platform Performance
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust stable
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Cache Cargo registry
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-crossperf-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Run performance tests
+      run: |
+        echo "Running performance test on ${{ matrix.os }}..."
+        cargo run --release --example performance_test --features pure-rust
+
+    - name: System information
+      shell: bash
+      run: |
+        echo "System Information for ${{ matrix.os }}:"
+        if [ "${{ runner.os }}" = "Linux" ]; then
+          lscpu | head -20
+          free -h
+        elif [ "${{ runner.os }}" = "macOS" ]; then
+          sysctl -n machdep.cpu.brand_string
+          sysctl -n hw.memsize | awk '{print $0/1024/1024/1024 " GB"}'
+        elif [ "${{ runner.os }}" = "Windows" ]; then
+          wmic cpu get name
+          wmic computersystem get TotalPhysicalMemory
+        fi

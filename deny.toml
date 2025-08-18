@@ -1,0 +1,98 @@
+# cargo-deny configuration for saorsa-fec
+# This configuration ensures security and license compliance
+
+[graph]
+# Prevent certain crates from being used as dependencies
+targets = [
+    { triple = "x86_64-unknown-linux-gnu" },
+    { triple = "x86_64-apple-darwin" },
+    { triple = "x86_64-pc-windows-msvc" },
+]
+
+[advisories]
+# Security vulnerability checking
+db-path = "~/.cargo/advisory-db"
+db-urls = ["https://github.com/rustsec/advisory-db"]
+vulnerability = "deny"
+unmaintained = "warn"
+yanked = "warn"
+notice = "warn"
+ignore = [
+    # Add any security advisories to ignore here (with justification)
+]
+
+[licenses]
+# License checking - only allow approved licenses
+unlicensed = "deny"
+allow = [
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "MIT",
+    "MIT-0",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Unicode-DFS-2016",
+    "CC0-1.0",
+    "Unlicense",
+    "MPL-2.0",
+    "AGPL-3.0",  # Our license
+]
+deny = [
+    "GPL-2.0",
+    "GPL-3.0", 
+    "LGPL-2.0",
+    "LGPL-2.1",
+    "LGPL-3.0",
+    "AGPL-1.0",
+    "AGPL-3.0+",  # Only exact AGPL-3.0 allowed
+]
+copyleft = "allow"  # We're AGPL so copyleft is OK
+allow-osi-fsf-free = "both"
+default = "deny"
+confidence-threshold = 0.8
+
+[bans]
+# Banned dependencies that could introduce vulnerabilities
+multiple-versions = "warn"
+wildcards = "allow"
+highlight = "all"
+workspace-default-features = "allow"
+external-default-features = "allow"
+allow = []
+
+# Specifically ban dependencies that could introduce RSA vulnerabilities
+deny = [
+    # MySQL-related crates that could pull in vulnerable RSA
+    { name = "mysql", reason = "Could introduce RSA vulnerabilities" },
+    { name = "mysql_async", reason = "Could introduce RSA vulnerabilities" },
+    { name = "mysql_common", reason = "Could introduce RSA vulnerabilities" },
+    { name = "sqlx-mysql", reason = "Could introduce RSA vulnerabilities" },
+    
+    # PostgreSQL crates that might pull in problematic crypto
+    { name = "sqlx-postgres", reason = "Not needed and could introduce crypto vulnerabilities" },
+    { name = "postgres", reason = "Not needed and could introduce crypto vulnerabilities" },
+    { name = "tokio-postgres", reason = "Not needed and could introduce crypto vulnerabilities" },
+    
+    # Old/vulnerable crypto crates
+    { name = "rsa", version = "<0.9.0", reason = "Known vulnerabilities in older versions" },
+    { name = "openssl", reason = "Use rustls instead for memory safety" },
+    { name = "openssl-sys", reason = "Use rustls instead for memory safety" },
+    
+    # Problematic dependencies
+    { name = "chrono", version = "<0.4.20", reason = "CVE-2020-26235" },
+    { name = "time", version = "<0.3.0", reason = "Soundness issues" },
+]
+
+# Skip certain crates during checking
+skip = []
+
+# Skip transitive dependencies from these crates
+skip-tree = []
+
+[sources]
+# Only allow crates.io and specific git repos
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = []
