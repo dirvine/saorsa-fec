@@ -1,0 +1,669 @@
+[1m[32m   Compiling[0m saorsa-fec v0.4.2 (/Users/davidirvine/Desktop/Devel/projects/saorsa-fec)
+[0m[1m[33mwarning[0m[0m[1m: method `with_failures` is never used[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0msrc/gc.rs:340:12[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m332[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    impl MockStorage {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;12m----------------[0m[0m [0m[0m[1m[38;5;12mmethod in this implementation[0m
+[0m[1m[38;5;12m...[0m
+[0m[1m[38;5;12m340[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        fn with_failures(mut self, chunks: Vec<[u8; 32]>) -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m            [0m[0m[1m[33m^^^^^^^^^^^^^[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: `#[warn(dead_code)]` on by default[0m
+
+[0m[1m[38;5;9merror[E0432][0m[0m[1m: unresolved import `saorsa_fec::ChunkConfig`[0m
+[0m  [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:11:5[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m11[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    ChunkConfig, Config, EncryptionMode, FecParams, Result, StoragePipeline,[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;9m^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9mno `ChunkConfig` in the root[0m
+
+[0m[1m[38;5;9merror[E0433][0m[0m[1m: failed to resolve: could not find `ReedSolomonBackend` in `saorsa_fec`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:148:21[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m148[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        saorsa_fec::ReedSolomonBackend::PureRust,[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;9m^^^^^^^^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9mcould not find `ReedSolomonBackend` in `saorsa_fec`[0m
+
+[0m[1m[38;5;9merror[E0433][0m[0m[1m: failed to resolve: could not find `ReedSolomonBackend` in `saorsa_fec`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:176:21[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m176[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        saorsa_fec::ReedSolomonBackend::PureRust,[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;9m^^^^^^^^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9mcould not find `ReedSolomonBackend` in `saorsa_fec`[0m
+
+[0m[1m[38;5;9merror[E0433][0m[0m[1m: failed to resolve: could not find `ReedSolomonBackend` in `saorsa_fec`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:208:21[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m208[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        saorsa_fec::ReedSolomonBackend::PureRust,[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;9m^^^^^^^^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9mcould not find `ReedSolomonBackend` in `saorsa_fec`[0m
+
+[0m[1m[38;5;9merror[E0433][0m[0m[1m: failed to resolve: could not find `ReedSolomonBackend` in `saorsa_fec`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:233:21[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m233[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        saorsa_fec::ReedSolomonBackend::PureRust,[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;9m^^^^^^^^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9mcould not find `ReedSolomonBackend` in `saorsa_fec`[0m
+
+[0m[1m[38;5;9merror[E0433][0m[0m[1m: failed to resolve: could not find `ReedSolomonBackend` in `saorsa_fec`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:266:25[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m266[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m            saorsa_fec::ReedSolomonBackend::PureRust,[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                         [0m[0m[1m[38;5;9m^^^^^^^^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9mcould not find `ReedSolomonBackend` in `saorsa_fec`[0m
+
+[0m[1m[38;5;9merror[E0433][0m[0m[1m: failed to resolve: could not find `ReedSolomonBackend` in `saorsa_fec`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:290:25[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m290[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m            saorsa_fec::ReedSolomonBackend::PureRust,[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                         [0m[0m[1m[38;5;9m^^^^^^^^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9mcould not find `ReedSolomonBackend` in `saorsa_fec`[0m
+
+[0m[1m[38;5;9merror[E0433][0m[0m[1m: failed to resolve: could not find `ReedSolomonBackend` in `saorsa_fec`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:314:25[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m314[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m            saorsa_fec::ReedSolomonBackend::PureRust,[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                         [0m[0m[1m[38;5;9m^^^^^^^^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9mcould not find `ReedSolomonBackend` in `saorsa_fec`[0m
+
+[0m[1m[33mwarning[0m[0m[1m: unused variable: `i`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mtests/v0_3_integration_test.rs:151:10[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m151[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    for (i, (data_shards, parity_shards)) in test_cases.iter().enumerate() {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m          [0m[0m[1m[33m^[0m[0m [0m[0m[1m[33mhelp: if this is intentional, prefix it with an underscore: `_i`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: `#[warn(unused_variables)]` on by default[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m  [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:89:67[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m89[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    let mut pipeline = StoragePipeline::new(config, storage).await?;[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m                        [0m[0m[1m[38;5;12m-------------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m                        [0m[0m[1m[38;5;12m|[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m                        [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m           but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m  [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:92:68[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m92[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    let metadata = pipeline.process_file(file_id, data, None).await?;[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m                    [0m[0m[1m[38;5;12m------------------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m                    [0m[0m[1m[38;5;12m|[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m                    [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m           but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0609][0m[0m[1m: no field `chunk_count` on type `saorsa_fec::metadata::FileMetadata`[0m
+[0m  [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:93:58[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m93[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    println!("   ✓ Stored file with {} chunks", metadata.chunk_count);[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m                                                          [0m[0m[1m[38;5;9m^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9munknown field[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: available fields are: `file_id`, `file_size`, `encryption_metadata`, `quantum_encryption_metadata`, `chunks` ... and 2 others[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m  [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:96:60[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m96[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    let retrieved = pipeline.retrieve_file(&metadata).await?;[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12m---------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12m|[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m           but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:101:74[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m101[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    let metadata2 = pipeline.process_file([0x43u8; 32], data, None).await?;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12m-----------------------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m            but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:120:67[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m120[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    let mut pipeline = StoragePipeline::new(config, storage).await?;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                        [0m[0m[1m[38;5;12m-------------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                        [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                        [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m            but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:122:68[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m122[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    let metadata = pipeline.process_file(file_id, data, None).await?;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                    [0m[0m[1m[38;5;12m------------------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                    [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m            but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:123:60[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m123[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    let retrieved = pipeline.retrieve_file(&metadata).await?;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12m---------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m            but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0599][0m[0m[1m: no function or associated item named `with_secret_encryption` found for struct `Config` in the current scope[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:146:26[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m146[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    let config = Config::with_secret_encryption([0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                          [0m[0m[1m[38;5;9m^^^^^^^^^^^^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9mfunction or associated item not found in `Config`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;10mnote[0m[0m: if you're trying to build a new `Config` consider using one of the following associated functions:[0m
+[0m      Config::new[0m
+[0m      Config::high_performance[0m
+[0m      Config::high_reliability[0m
+[0m      Config::minimal_storage[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0m/Users/davidirvine/Desktop/Devel/projects/saorsa-fec/src/config.rs:49:5[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m49[0m[0m  [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn new() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^[0m
+[0m[1m[38;5;12m...[0m
+[0m[1m[38;5;12m102[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn high_performance() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m[1m[38;5;12m...[0m
+[0m[1m[38;5;12m143[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn high_reliability() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m[1m[38;5;12m...[0m
+[0m[1m[38;5;12m191[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn minimal_storage() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:154:67[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m154[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    let mut pipeline = StoragePipeline::new(config, storage).await?;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                        [0m[0m[1m[38;5;12m-------------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                        [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                        [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m            but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:156:68[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m156[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    let metadata = pipeline.process_file(file_id, data, None).await?;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                    [0m[0m[1m[38;5;12m------------------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                    [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m            but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:159:60[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m159[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    let retrieved = pipeline.retrieve_file(&metadata).await?;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12m---------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m            but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0599][0m[0m[1m: no function or associated item named `with_secret_encryption` found for struct `Config` in the current scope[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:174:26[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m174[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    let config = Config::with_secret_encryption([0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                          [0m[0m[1m[38;5;9m^^^^^^^^^^^^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9mfunction or associated item not found in `Config`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;10mnote[0m[0m: if you're trying to build a new `Config` consider using one of the following associated functions:[0m
+[0m      Config::new[0m
+[0m      Config::high_performance[0m
+[0m      Config::high_reliability[0m
+[0m      Config::minimal_storage[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0m/Users/davidirvine/Desktop/Devel/projects/saorsa-fec/src/config.rs:49:5[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m49[0m[0m  [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn new() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^[0m
+[0m[1m[38;5;12m...[0m
+[0m[1m[38;5;12m102[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn high_performance() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m[1m[38;5;12m...[0m
+[0m[1m[38;5;12m143[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn high_reliability() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m[1m[38;5;12m...[0m
+[0m[1m[38;5;12m191[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn minimal_storage() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:182:67[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m182[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    let mut pipeline = StoragePipeline::new(config, storage).await?;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                        [0m[0m[1m[38;5;12m-------------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                        [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                        [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m            but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:184:68[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m184[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    let metadata = pipeline.process_file(file_id, data, None).await?;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                    [0m[0m[1m[38;5;12m------------------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                    [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m            but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:185:60[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m185[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    let retrieved = pipeline.retrieve_file(&metadata).await?;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12m---------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m            but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0599][0m[0m[1m: no function or associated item named `with_random_encryption` found for struct `Config` in the current scope[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:206:26[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m206[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    let config = Config::with_random_encryption([0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                          [0m[0m[1m[38;5;9m^^^^^^^^^^^^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9mfunction or associated item not found in `Config`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;10mnote[0m[0m: if you're trying to build a new `Config` consider using one of the following associated functions:[0m
+[0m      Config::new[0m
+[0m      Config::high_performance[0m
+[0m      Config::high_reliability[0m
+[0m      Config::minimal_storage[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0m/Users/davidirvine/Desktop/Devel/projects/saorsa-fec/src/config.rs:49:5[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m49[0m[0m  [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn new() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^[0m
+[0m[1m[38;5;12m...[0m
+[0m[1m[38;5;12m102[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn high_performance() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m[1m[38;5;12m...[0m
+[0m[1m[38;5;12m143[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn high_reliability() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m[1m[38;5;12m...[0m
+[0m[1m[38;5;12m191[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn minimal_storage() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:213:67[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m213[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    let mut pipeline = StoragePipeline::new(config, storage).await?;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                        [0m[0m[1m[38;5;12m-------------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                        [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                        [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m            but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:215:68[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m215[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    let metadata = pipeline.process_file(file_id, data, None).await?;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                    [0m[0m[1m[38;5;12m------------------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                    [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m            but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:218:60[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m218[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    let retrieved = pipeline.retrieve_file(&metadata).await?;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12m---------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m            but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0599][0m[0m[1m: no function or associated item named `with_random_encryption` found for struct `Config` in the current scope[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:231:26[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m231[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    let config = Config::with_random_encryption([0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                          [0m[0m[1m[38;5;9m^^^^^^^^^^^^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9mfunction or associated item not found in `Config`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;10mnote[0m[0m: if you're trying to build a new `Config` consider using one of the following associated functions:[0m
+[0m      Config::new[0m
+[0m      Config::high_performance[0m
+[0m      Config::high_reliability[0m
+[0m      Config::minimal_storage[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0m/Users/davidirvine/Desktop/Devel/projects/saorsa-fec/src/config.rs:49:5[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m49[0m[0m  [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn new() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^[0m
+[0m[1m[38;5;12m...[0m
+[0m[1m[38;5;12m102[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn high_performance() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m[1m[38;5;12m...[0m
+[0m[1m[38;5;12m143[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn high_reliability() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m[1m[38;5;12m...[0m
+[0m[1m[38;5;12m191[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn minimal_storage() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:238:67[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m238[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    let mut pipeline = StoragePipeline::new(config, storage).await?;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                        [0m[0m[1m[38;5;12m-------------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                        [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                        [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m            but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:240:68[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m240[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    let metadata = pipeline.process_file(file_id, data, None).await?;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                    [0m[0m[1m[38;5;12m------------------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                    [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m            but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:241:60[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m241[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    let retrieved = pipeline.retrieve_file(&metadata).await?;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12m---------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m            but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0599][0m[0m[1m: no function or associated item named `with_convergent_encryption` found for struct `Config` in the current scope[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:264:30[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m264[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        let config = Config::with_convergent_encryption([0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                              [0m[0m[1m[38;5;9m^^^^^^^^^^^^^^^^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9mfunction or associated item not found in `Config`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;10mnote[0m[0m: if you're trying to build a new `Config` consider using one of the following associated functions:[0m
+[0m      Config::new[0m
+[0m      Config::high_performance[0m
+[0m      Config::high_reliability[0m
+[0m      Config::minimal_storage[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0m/Users/davidirvine/Desktop/Devel/projects/saorsa-fec/src/config.rs:49:5[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m49[0m[0m  [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn new() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^[0m
+[0m[1m[38;5;12m...[0m
+[0m[1m[38;5;12m102[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn high_performance() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m[1m[38;5;12m...[0m
+[0m[1m[38;5;12m143[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn high_reliability() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m[1m[38;5;12m...[0m
+[0m[1m[38;5;12m191[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn minimal_storage() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:271:71[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m271[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        let mut pipeline = StoragePipeline::new(config, storage).await?;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                            [0m[0m[1m[38;5;12m-------------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                            [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                            [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m            but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:273:78[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m273[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        let meta1 = pipeline.process_file(file_id1, test_content, None).await?;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12m---------------------------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m            but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:274:78[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m274[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        let meta2 = pipeline.process_file(file_id2, test_content, None).await?;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12m---------------------------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m            but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0609][0m[0m[1m: no field `chunk_count` on type `saorsa_fec::metadata::FileMetadata`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:278:19[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m278[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m            meta1.chunk_count, meta2.chunk_count[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                   [0m[0m[1m[38;5;9m^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9munknown field[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: available fields are: `file_id`, `file_size`, `encryption_metadata`, `quantum_encryption_metadata`, `chunks` ... and 2 others[0m
+
+[0m[1m[38;5;9merror[E0609][0m[0m[1m: no field `chunk_count` on type `saorsa_fec::metadata::FileMetadata`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:278:38[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m278[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m            meta1.chunk_count, meta2.chunk_count[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                                      [0m[0m[1m[38;5;9m^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9munknown field[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: available fields are: `file_id`, `file_size`, `encryption_metadata`, `quantum_encryption_metadata`, `chunks` ... and 2 others[0m
+
+[0m[1m[38;5;9merror[E0599][0m[0m[1m: no function or associated item named `with_secret_encryption` found for struct `Config` in the current scope[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:288:30[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m288[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        let config = Config::with_secret_encryption([0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                              [0m[0m[1m[38;5;9m^^^^^^^^^^^^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9mfunction or associated item not found in `Config`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;10mnote[0m[0m: if you're trying to build a new `Config` consider using one of the following associated functions:[0m
+[0m      Config::new[0m
+[0m      Config::high_performance[0m
+[0m      Config::high_reliability[0m
+[0m      Config::minimal_storage[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0m/Users/davidirvine/Desktop/Devel/projects/saorsa-fec/src/config.rs:49:5[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m49[0m[0m  [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn new() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^[0m
+[0m[1m[38;5;12m...[0m
+[0m[1m[38;5;12m102[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn high_performance() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m[1m[38;5;12m...[0m
+[0m[1m[38;5;12m143[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn high_reliability() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m[1m[38;5;12m...[0m
+[0m[1m[38;5;12m191[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn minimal_storage() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:296:71[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m296[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        let mut pipeline = StoragePipeline::new(config, storage).await?;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                            [0m[0m[1m[38;5;12m-------------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                            [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                            [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m            but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:298:78[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m298[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        let meta1 = pipeline.process_file(file_id1, test_content, None).await?;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12m---------------------------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m            but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:299:78[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m299[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        let meta2 = pipeline.process_file(file_id2, test_content, None).await?;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12m---------------------------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m            but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0609][0m[0m[1m: no field `chunk_count` on type `saorsa_fec::metadata::FileMetadata`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:303:19[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m303[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m            meta1.chunk_count, meta2.chunk_count[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                   [0m[0m[1m[38;5;9m^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9munknown field[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: available fields are: `file_id`, `file_size`, `encryption_metadata`, `quantum_encryption_metadata`, `chunks` ... and 2 others[0m
+
+[0m[1m[38;5;9merror[E0609][0m[0m[1m: no field `chunk_count` on type `saorsa_fec::metadata::FileMetadata`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:303:38[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m303[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m            meta1.chunk_count, meta2.chunk_count[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                                      [0m[0m[1m[38;5;9m^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9munknown field[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: available fields are: `file_id`, `file_size`, `encryption_metadata`, `quantum_encryption_metadata`, `chunks` ... and 2 others[0m
+
+[0m[1m[38;5;9merror[E0599][0m[0m[1m: no function or associated item named `with_random_encryption` found for struct `Config` in the current scope[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:312:30[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m312[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        let config = Config::with_random_encryption([0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                              [0m[0m[1m[38;5;9m^^^^^^^^^^^^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9mfunction or associated item not found in `Config`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;10mnote[0m[0m: if you're trying to build a new `Config` consider using one of the following associated functions:[0m
+[0m      Config::new[0m
+[0m      Config::high_performance[0m
+[0m      Config::high_reliability[0m
+[0m      Config::minimal_storage[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0m/Users/davidirvine/Desktop/Devel/projects/saorsa-fec/src/config.rs:49:5[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m49[0m[0m  [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn new() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^[0m
+[0m[1m[38;5;12m...[0m
+[0m[1m[38;5;12m102[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn high_performance() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m[1m[38;5;12m...[0m
+[0m[1m[38;5;12m143[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn high_reliability() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m[1m[38;5;12m...[0m
+[0m[1m[38;5;12m191[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m    pub fn minimal_storage() -> Self {[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m     [0m[0m[1m[38;5;10m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:319:71[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m319[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        let mut pipeline = StoragePipeline::new(config, storage).await?;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                            [0m[0m[1m[38;5;12m-------------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                            [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                            [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m            but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:321:78[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m321[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        let meta1 = pipeline.process_file(file_id1, test_content, None).await?;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12m---------------------------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m            but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0277][0m[0m[1m: `?` couldn't convert the error to `FecError`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:322:78[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m322[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        let meta2 = pipeline.process_file(file_id2, test_content, None).await?;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12m---------------------------------------------------------[0m[0m[1m[38;5;9m^[0m[0m [0m[0m[1m[38;5;9mthe trait `From<anyhow::Error>` is not implemented for `FecError`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                     [0m[0m[1m[38;5;12mthis can't be annotated with `?` because it has type `Result<_, anyhow::Error>`[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: the question mark operation (`?`) implicitly performs a conversion on the error value using the `From` trait[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: the trait `From<[0m[0m[1m[35manyhow::Error[0m[0m>` [0m[0m[1m[35mis not[0m[0m implemented for `FecError`[0m
+[0m            but trait `From<[0m[0m[1m[35mstd::io::Error[0m[0m>` [0m[0m[1m[35mis[0m[0m implemented for it[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for that trait implementation, expected `[0m[0m[1m[35mstd::io::Error[0m[0m`, found `[0m[0m[1m[35manyhow::Error[0m[0m`[0m
+
+[0m[1m[38;5;9merror[E0609][0m[0m[1m: no field `chunk_count` on type `saorsa_fec::metadata::FileMetadata`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:326:19[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m326[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m            meta1.chunk_count, meta2.chunk_count[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                   [0m[0m[1m[38;5;9m^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9munknown field[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: available fields are: `file_id`, `file_size`, `encryption_metadata`, `quantum_encryption_metadata`, `chunks` ... and 2 others[0m
+
+[0m[1m[38;5;9merror[E0609][0m[0m[1m: no field `chunk_count` on type `saorsa_fec::metadata::FileMetadata`[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0mexamples/encryption_modes_demo.rs:326:38[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m326[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m            meta1.chunk_count, meta2.chunk_count[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                                      [0m[0m[1m[38;5;9m^^^^^^^^^^^[0m[0m [0m[0m[1m[38;5;9munknown field[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: available fields are: `file_id`, `file_size`, `encryption_metadata`, `quantum_encryption_metadata`, `chunks` ... and 2 others[0m
+
+[0m[1mSome errors have detailed explanations: E0277, E0432, E0433, E0599, E0609.[0m
+[0m[1mFor more information about an error, try `rustc --explain E0277`.[0m
+[1m[31merror[0m[1m:[0m could not compile `saorsa-fec` (example "encryption_modes_demo") due to 50 previous errors
+[1m[33mwarning[0m[1m:[0m build failed, waiting for other jobs to finish...
+[1m[33mwarning[0m[1m:[0m `saorsa-fec` (lib test) generated 1 warning
+[1m[33mwarning[0m[1m:[0m `saorsa-fec` (test "v0_3_integration_test") generated 1 warning
