@@ -77,11 +77,11 @@ impl Gf256 {
     }
 
     /// Get the multiplicative inverse
-    pub fn inv(self) -> Self {
+    pub fn inv(self) -> Result<Self, &'static str> {
         if self.0 == 0 {
-            panic!("Cannot invert zero in GF(256)");
+            return Err("Cannot invert zero in GF(256)");
         }
-        Self(EXP_TABLE[(255 - LOG_TABLE[self.0 as usize]) as usize])
+        Ok(Self(EXP_TABLE[(255 - LOG_TABLE[self.0 as usize]) as usize]))
     }
 
     /// Raise to a power
@@ -96,6 +96,20 @@ impl Gf256 {
         let log_val = LOG_TABLE[self.0 as usize] as u32;
         let result = (log_val * exp as u32) % 255;
         Self(EXP_TABLE[result as usize])
+    }
+
+    /// Safe division that returns a Result
+    pub fn safe_div(self, other: Self) -> Result<Self, &'static str> {
+        if other.0 == 0 {
+            return Err("Division by zero in GF(256)");
+        }
+        if self.0 == 0 {
+            return Ok(Self::ZERO);
+        }
+
+        let log_diff =
+            (LOG_TABLE[self.0 as usize] as i16 - LOG_TABLE[other.0 as usize] as i16 + 255) % 255;
+        Ok(Self(EXP_TABLE[log_diff as usize]))
     }
 }
 
@@ -240,7 +254,10 @@ pub fn invert_matrix(matrix: &[Vec<Gf256>]) -> Option<Vec<Vec<Gf256>>> {
 
         // Scale pivot row
         let pivot = work[col][col];
-        let pivot_inv = pivot.inv();
+        let pivot_inv = match pivot.inv() {
+            Ok(inv) => inv,
+            Err(_) => return None, // Cannot invert zero
+        };
         for j in 0..n {
             work[col][j] = work[col][j] * pivot_inv;
             inv[col][j] = inv[col][j] * pivot_inv;
@@ -282,7 +299,7 @@ mod tests {
     fn test_inverse() {
         for i in 1..=255 {
             let a = Gf256::new(i);
-            let inv = a.inv();
+            let inv = a.inv().expect("Non-zero elements should have inverse");
             assert_eq!(a * inv, Gf256::ONE);
         }
     }

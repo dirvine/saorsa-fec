@@ -155,20 +155,19 @@ impl FecBackend for PureRustBackend {
         let mut matrix = vec![vec![0u8; k]; k + m];
 
         // Identity matrix for data shards
-        for i in 0..k {
-            matrix[i][i] = 1;
+        for (i, row) in matrix.iter_mut().enumerate().take(k) {
+            row[i] = 1;
         }
 
         // Vandermonde-like matrix for parity shards (simplified)
-        for i in k..(k + m) {
-            for j in 0..k {
-                matrix[i][j] = ((i - k + 1) * (j + 1)) as u8;
+        for (i, row) in matrix.iter_mut().enumerate().skip(k).take(m) {
+            for (j, cell) in row.iter_mut().enumerate().take(k) {
+                *cell = ((i - k + 1) * (j + 1)) as u8;
             }
         }
 
         matrix
     }
-
     fn name(&self) -> &'static str {
         "reed-solomon-simd"
     }

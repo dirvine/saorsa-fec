@@ -272,8 +272,8 @@ pub fn generate_deterministic_nonce(
     // Domain separation for nonce generation
     hasher.update(b"saorsa-fec-nonce-v0.3");
     hasher.update(file_id);
-    hasher.update(&chunk_index.to_le_bytes());
-    hasher.update(&shard_index.to_le_bytes());
+    hasher.update(chunk_index.to_le_bytes());
+    hasher.update(shard_index.to_le_bytes());
 
     let hash = hasher.finalize();
     let mut nonce = [0u8; 12];

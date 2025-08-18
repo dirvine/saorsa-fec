@@ -46,7 +46,7 @@ pub struct Config {
 impl Config {
     /// Create a new configuration with default settings
     /// Required by v0.3 specification
-    pub fn default() -> Self {
+    pub fn new() -> Self {
         Self {
             encryption_mode: EncryptionMode::Convergent,
             data_shards: 16,
@@ -63,17 +63,11 @@ impl Config {
         }
     }
 
-    /// Create a new configuration with default settings
-    pub fn new() -> Self {
-        Self::default()
-    }
-
     /// Set encryption mode (v0.3 builder pattern)
     pub fn with_encryption_mode(mut self, mode: EncryptionMode) -> Self {
         self.encryption_mode = mode;
         self
     }
-
 
     /// Set FEC parameters (v0.3 builder pattern)
     /// overhead = parity_shards / data_shards
@@ -257,10 +251,10 @@ impl Config {
 
 impl Default for Config {
     fn default() -> Self {
-        Self::default()
+        Self::new()
     }
-}
 
+}
 /// Encryption configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EncryptionConfig {
@@ -271,7 +265,6 @@ pub struct EncryptionConfig {
     /// Compression level (1-9)
     pub compression_level: u32,
 }
-
 impl Default for EncryptionConfig {
     fn default() -> Self {
         Self {

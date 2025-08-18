@@ -22,18 +22,16 @@ impl FecBackend for IsaLBackend {
         _parity: &mut [Vec<u8>],
         _params: FecParams,
     ) -> Result<()> {
-        // TODO: Implement ISA-L hardware acceleration
-        unimplemented!("ISA-L backend not yet implemented")
+        anyhow::bail!("ISA-L backend not yet implemented - use pure-rust backend instead")
     }
 
     fn decode_blocks(&self, _shares: &mut [Option<Vec<u8>>], _params: FecParams) -> Result<()> {
-        // TODO: Implement ISA-L hardware acceleration
-        unimplemented!("ISA-L backend not yet implemented")
+        anyhow::bail!("ISA-L backend not yet implemented - use pure-rust backend instead")
     }
 
     fn generate_matrix(&self, _k: usize, _m: usize) -> Vec<Vec<u8>> {
-        // TODO: Implement ISA-L matrix generation
-        unimplemented!("ISA-L backend not yet implemented")
+        // Return empty matrix as placeholder - this will cause calling code to use default
+        Vec::new()
     }
 
     fn name(&self) -> &'static str {
@@ -46,7 +44,7 @@ pub struct IsaLBackend;
 
 #[cfg(not(feature = "isa-l"))]
 impl IsaLBackend {
-    pub fn new() -> Self {
-        panic!("ISA-L backend not available - enable 'isa-l' feature")
+    pub fn new() -> Result<Self, &'static str> {
+        Err("ISA-L backend not available - enable 'isa-l' feature")
     }
 }

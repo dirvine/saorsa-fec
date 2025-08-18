@@ -19,20 +19,15 @@ use zeroize::{Zeroize, ZeroizeOnDrop};
 use crate::config::EncryptionMode;
 
 /// Security levels for post-quantum cryptography
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, Default)]
 pub enum SecurityLevel {
     /// NIST Level 1 (128-bit security)
     Level1,
     /// NIST Level 3 (192-bit security) - Default
+    #[default]
     Level3,
     /// NIST Level 5 (256-bit security)
     Level5,
-}
-
-impl Default for SecurityLevel {
-    fn default() -> Self {
-        SecurityLevel::Level3
-    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
