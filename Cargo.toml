@@ -17,6 +17,7 @@ exclude = [
     "tests/v0_3_integration_test.rs",
     "examples/encryption_modes_demo.rs",
     "examples/v0_3_api_demo.rs",
+    "examples/performance_test.rs",
     "docs/v0_3_api_guide.md",
     "node_modules/",
     ".claude/",
