@@ -134,22 +134,11 @@ impl PureRustBackend {
 
         // If we have missing data shards, we need to reconstruct them
         if !missing_indices.is_empty() {
-            // Get references to available shards
-            let mut shard_refs: Vec<&[u8]> = work_shards[0..k].iter().map(|v| v.as_slice()).collect();
-            
-            // Re-encode to get parity (this will match the original parity)
-            let mut parity_shards = vec![vec![]; m];
-            encoder.encode(&shard_refs, &mut parity_shards)
-                .map_err(|e| FecError::Backend(format!("Re-encode failed: {:?}", e)))?;
-            
-            // Now we have systematic encoding, but reed-solomon-simd v3 doesn't have direct reconstruction
-            // For proper reconstruction, we'd need to use matrix inversion which isn't exposed
-            // For now, if we have missing data shards and need parity reconstruction, we need a workaround
-            
-            // Simple workaround: if we have enough shards total, we can try different combinations
-            // This is not efficient but works for small numbers of shards
+            // reed-solomon-simd v3 doesn't expose direct reconstruction
+            // We can only use it for encoding, not for decoding missing data shards
+            // For now, return an error if we need complex reconstruction
             return Err(FecError::Backend(
-                "Reed-Solomon reconstruction with missing data shards requires matrix operations not exposed in reed-solomon-simd v3".to_string(),
+                "Reed-Solomon reconstruction with missing data shards is not supported in reed-solomon-simd v3".to_string(),
             ));
         }
 
