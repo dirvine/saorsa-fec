@@ -73,6 +73,10 @@ flate2 = "1.0"
 [target.'cfg(target_arch = "x86_64")'.dependencies]
 isa-l = { version = "0.1", optional = true }
 
+# WASM-specific dependencies
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+getrandom = { version = "0.2", features = ["js"] }
+
 [dev-dependencies]
 proptest = "1.4"
 criterion = { version = "0.5", features = ["html_reports"] }
