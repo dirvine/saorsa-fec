@@ -17,7 +17,7 @@ async fn test_v0_3_config_builder_pattern() -> Result<()> {
     assert_eq!(config.data_shards, 8);
     assert_eq!(config.parity_shards, 2);
     assert_eq!(config.chunk_size, 32 * 1024);
-    assert_eq!(config.compression_enabled, true);
+    assert!(config.compression_enabled);
     assert_eq!(config.compression_level, 9);
 
     Ok(())
@@ -148,10 +148,10 @@ async fn test_v0_3_fec_parameters() -> Result<()> {
         (20, 5), // 25% overhead
     ];
 
-    for (i, (data_shards, parity_shards)) in test_cases.iter().enumerate() {
+    for (data_shards, parity_shards) in test_cases.iter() {
         let temp_dir = TempDir::new()?;
         let backend = LocalStorage::new(temp_dir.path().to_path_buf()).await?;
-        
+
         let config = Config::default()
             .with_fec_params(*data_shards, *parity_shards)
             .with_encryption_mode(EncryptionMode::Convergent);

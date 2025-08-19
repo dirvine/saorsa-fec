@@ -173,7 +173,7 @@ Performance scales with file size and benefits from SIMD instructions available 
 # Build and test
 cargo build --release
 cargo test --all-features  
-cargo clippy -- -D warnings
+cargo clippy -- -D warnings -D clippy::correctness -D clippy::suspicious -D clippy::complexity -W clippy::perf -W clippy::style
 
 # Run benchmarks
 cargo bench --features bench

@@ -11,13 +11,12 @@ use std::sync::Arc;
 use crate::chunk_registry::{ChunkInfo, ChunkRegistry};
 use crate::config::{Config, EncryptionMode};
 use crate::crypto::{
-    CryptoEngine, EncryptionKey, EncryptionMetadata,
-    derive_convergent_key, generate_random_key,
+    CryptoEngine, EncryptionKey, EncryptionMetadata, derive_convergent_key, generate_random_key,
 };
-use crate::quantum_crypto::QuantumCryptoEngine;
 use crate::gc::GarbageCollector;
 use crate::ida::IDAConfig;
 use crate::metadata::{ChunkReference, FileMetadata, LocalMetadata};
+use crate::quantum_crypto::QuantumCryptoEngine;
 use crate::storage::StorageBackend;
 use crate::types::{ChunkId, DataId, ShareId};
 use crate::version::VersionManager;
@@ -228,7 +227,7 @@ impl<B: StorageBackend> StoragePipeline<B> {
         // Decrypt using quantum engine
         let decrypted = if let Some(quantum_meta) = &meta.quantum_encryption_metadata {
             let crypto = QuantumCryptoEngine::new();
-            
+
             // Get convergence secret if needed
             let secret = if quantum_meta.convergence_secret_id.is_some() {
                 let secret_bytes = self.get_user_secret()?;

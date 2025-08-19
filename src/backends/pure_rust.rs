@@ -120,7 +120,7 @@ impl PureRustBackend {
         // Missing shards will be replaced with zeros temporarily
         let mut work_shards: Vec<Vec<u8>> = Vec::with_capacity(n);
         let mut missing_indices = Vec::new();
-        
+
         for (i, shard) in shares.iter().enumerate() {
             if let Some(data) = shard {
                 work_shards.push(data.clone());

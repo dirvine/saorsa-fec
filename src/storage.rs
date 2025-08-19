@@ -306,9 +306,7 @@ impl LocalStorage {
     pub async fn new(base_path: PathBuf) -> Result<Self, FecError> {
         let metadata_path = base_path.join("metadata");
 
-        fs::create_dir_all(&base_path)
-            .await
-            .map_err(FecError::Io)?;
+        fs::create_dir_all(&base_path).await.map_err(FecError::Io)?;
         fs::create_dir_all(&metadata_path)
             .await
             .map_err(FecError::Io)?;
@@ -428,11 +426,13 @@ impl StorageBackend for LocalStorage {
                     stack.push(path);
                 } else if let Some(name) = path.file_name()
                     && let Some(name_str) = name.to_str()
-                    && name_str.ends_with(".shard") {
+                    && name_str.ends_with(".shard")
+                {
                     // Extract hex CID from filename
                     let hex = name_str.trim_end_matches(".shard");
                     if let Ok(cid_bytes) = hex::decode(hex)
-                        && cid_bytes.len() == 32 {
+                        && cid_bytes.len() == 32
+                    {
                         let mut cid_array = [0u8; 32];
                         cid_array.copy_from_slice(&cid_bytes);
                         shards.push(Cid::new(cid_array));
@@ -495,13 +495,13 @@ impl StorageBackend for LocalStorage {
             let path = entry.path();
             if let Some(name) = path.file_name()
                 && let Some(name_str) = name.to_str()
-                && name_str.ends_with(".meta") {
+                && name_str.ends_with(".meta")
+            {
                 let data = fs::read(&path).await.map_err(FecError::Io)?;
                 if let Ok(metadata) = bincode::deserialize::<FileMetadata>(&data) {
                     metadata_list.push(metadata);
                 }
             }
-
         }
 
         Ok(metadata_list)
@@ -575,13 +575,13 @@ impl StorageBackend for LocalStorage {
         // Delete unreferenced shards
         for cid in shards {
             if !referenced_cids.contains(&cid)
-                && let Ok(shard) = self.get_shard(&cid).await {
+                && let Ok(shard) = self.get_shard(&cid).await
+            {
                 let shard_size = shard.data.len() as u64 + ShardHeader::SIZE as u64;
                 if self.delete_shard(&cid).await.is_ok() {
                     shards_deleted += 1;
                     bytes_freed += shard_size;
                 }
-
             }
         }
 

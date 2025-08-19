@@ -80,7 +80,8 @@ impl FileMetadata {
 
         // Hash encryption metadata if present
         if let Some(enc) = &self.encryption_metadata
-            && let Ok(serialized) = bincode::serialize(enc) {
+            && let Ok(serialized) = bincode::serialize(enc)
+        {
             hasher.update(&serialized);
         }
         // Hash chunk references (deterministic order)
@@ -315,10 +316,13 @@ impl MetadataStore {
         for entry in std::fs::read_dir(&self.base_path)? {
             let entry = entry?;
             if let Some(name) = entry.file_name().to_str()
-                && name.ends_with(".meta") && name.len() == 68 {
+                && name.ends_with(".meta")
+                && name.len() == 68
+            {
                 // 64 hex chars + ".meta"
                 if let Ok(id_bytes) = hex::decode(&name[..64])
-                    && id_bytes.len() == 32 {
+                    && id_bytes.len() == 32
+                {
                     let mut id = [0u8; 32];
                     id.copy_from_slice(&id_bytes);
                     ids.push(id);

@@ -18,7 +18,6 @@ pub enum EncryptionMode {
     RandomKey,
 }
 
-
 /// Main configuration for the Saorsa FEC system
 /// Supports builder pattern as specified in v0.3
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -253,7 +252,6 @@ impl Default for Config {
     fn default() -> Self {
         Self::new()
     }
-
 }
 /// Encryption configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]

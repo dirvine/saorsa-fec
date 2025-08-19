@@ -32,7 +32,7 @@ proptest! {
         let m = params.parity_shares as usize;
 
         // Split data into k blocks with even size (reed-solomon-simd requirement)
-        let block_size = ((data.len().div_ceil(k) + 1) / 2) * 2; // Round up to even
+        let block_size = data.len().div_ceil(k).div_ceil(2) * 2; // Round up to even
         let mut blocks = vec![vec![0u8; block_size]; k];
 
         for (i, chunk) in data.chunks(block_size).enumerate() {
@@ -71,7 +71,7 @@ proptest! {
         let m = params.parity_shares as usize;
 
         // Create data blocks with even size
-        let block_size = ((data.len().div_ceil(k) + 1) / 2) * 2; // Round up to even
+        let block_size = data.len().div_ceil(k).div_ceil(2) * 2; // Round up to even
         let mut blocks = vec![vec![0u8; block_size]; k];
 
         for (i, chunk) in data.chunks(block_size).enumerate() {
@@ -105,7 +105,7 @@ proptest! {
         let m = params.parity_shares as usize;
 
         // Create data blocks with even size
-        let block_size = ((data.len().div_ceil(k) + 1) / 2) * 2; // Round up to even
+        let block_size = data.len().div_ceil(k).div_ceil(2) * 2; // Round up to even
         let mut blocks = vec![vec![0u8; block_size]; k];
 
         for (i, chunk) in data.chunks(block_size).enumerate() {

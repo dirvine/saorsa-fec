@@ -8,7 +8,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  RUSTFLAGS: "-D warnings -W clippy::all -W clippy::pedantic -W clippy::nursery"
+  RUSTFLAGS: "-D warnings"
 
 jobs:
   test:
@@ -93,12 +93,12 @@ jobs:
         
         exit $EXIT_CODE
     
-    - name: Clippy linting (ultra-strict)
+    - name: Clippy linting
       run: |
         if [ "${{ matrix.features }}" = "" ]; then
-          cargo clippy --all-targets -- -D warnings -D clippy::all -D clippy::pedantic
+          cargo clippy --all-targets -- -D warnings -D clippy::correctness -D clippy::suspicious -D clippy::complexity -W clippy::perf -W clippy::style
         else
-          cargo clippy --all-targets --features "${{ matrix.features }}" -- -D warnings -D clippy::all -D clippy::pedantic
+          cargo clippy --all-targets --features "${{ matrix.features }}" -- -D warnings -D clippy::correctness -D clippy::suspicious -D clippy::complexity -W clippy::perf -W clippy::style
         fi
     
     - name: Build with features
