@@ -113,7 +113,7 @@ impl PureRustBackend {
 
         // For reconstruction with reed-solomon-simd v3, we need to re-encode and replace missing shards
         // Create encoder
-        let encoder = ReedSolomonEncoder::new(k, m, block_size)
+        let _encoder = ReedSolomonEncoder::new(k, m, block_size)
             .map_err(|e| FecError::Backend(format!("Failed to create encoder: {:?}", e)))?;
 
         // Convert Option<Vec<u8>> to Vec<Vec<u8>> for processing
