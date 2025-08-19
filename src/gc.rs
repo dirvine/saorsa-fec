@@ -337,6 +337,7 @@ mod tests {
             }
         }
 
+        #[allow(dead_code)]
         fn with_failures(mut self, chunks: Vec<[u8; 32]>) -> Self {
             self.fail_on = chunks.into_iter().collect();
             self
