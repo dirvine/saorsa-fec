@@ -37,6 +37,21 @@ jobs:
     - name: Install Rust stable
       uses: dtolnay/rust-toolchain@stable
 
+    - name: Install ISA-L (Linux only)
+      if: runner.os == 'Linux' && matrix.features == 'isa-l'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential autoconf automake libtool yasm
+        git clone https://github.com/intel/isa-l.git
+        cd isa-l
+        ./autogen.sh
+        ./configure --prefix=/usr --libdir=/usr/lib/x86_64-linux-gnu
+        make -j$(nproc)
+        sudo make install
+        sudo ldconfig
+        cd ..
+        rm -rf isa-l
+
     - name: Cache Cargo registry
       uses: actions/cache@v4
       with:
