@@ -22,11 +22,15 @@ impl FecBackend for IsaLBackend {
         _parity: &mut [Vec<u8>],
         _params: FecParams,
     ) -> Result<()> {
-        anyhow::bail!("ISA-L backend not yet implemented - use pure-rust backend instead")
+        Err(crate::FecError::UnsupportedOperation(
+            "ISA-L backend not yet implemented - use pure-rust backend instead".to_string()
+        ))
     }
 
     fn decode_blocks(&self, _shares: &mut [Option<Vec<u8>>], _params: FecParams) -> Result<()> {
-        anyhow::bail!("ISA-L backend not yet implemented - use pure-rust backend instead")
+        Err(crate::FecError::UnsupportedOperation(
+            "ISA-L backend not yet implemented - use pure-rust backend instead".to_string()
+        ))
     }
 
     fn generate_matrix(&self, _k: usize, _m: usize) -> Vec<Vec<u8>> {
