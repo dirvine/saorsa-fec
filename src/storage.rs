@@ -424,18 +424,19 @@ impl StorageBackend for LocalStorage {
 
                 if path.is_dir() {
                     stack.push(path);
-                } else if let Some(name) = path.file_name()
-                    && let Some(name_str) = name.to_str()
-                    && name_str.ends_with(".shard")
-                {
-                    // Extract hex CID from filename
-                    let hex = name_str.trim_end_matches(".shard");
-                    if let Ok(cid_bytes) = hex::decode(hex)
-                        && cid_bytes.len() == 32
-                    {
-                        let mut cid_array = [0u8; 32];
-                        cid_array.copy_from_slice(&cid_bytes);
-                        shards.push(Cid::new(cid_array));
+                } else if let Some(name) = path.file_name() {
+                    if let Some(name_str) = name.to_str() {
+                        if name_str.ends_with(".shard") {
+                            // Extract hex CID from filename
+                            let hex = name_str.trim_end_matches(".shard");
+                            if let Ok(cid_bytes) = hex::decode(hex) {
+                                if cid_bytes.len() == 32 {
+                                    let mut cid_array = [0u8; 32];
+                                    cid_array.copy_from_slice(&cid_bytes);
+                                    shards.push(Cid::new(cid_array));
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -493,13 +494,14 @@ impl StorageBackend for LocalStorage {
 
         while let Some(entry) = entries.next_entry().await.map_err(FecError::Io)? {
             let path = entry.path();
-            if let Some(name) = path.file_name()
-                && let Some(name_str) = name.to_str()
-                && name_str.ends_with(".meta")
-            {
-                let data = fs::read(&path).await.map_err(FecError::Io)?;
-                if let Ok(metadata) = bincode::deserialize::<FileMetadata>(&data) {
-                    metadata_list.push(metadata);
+            if let Some(name) = path.file_name() {
+                if let Some(name_str) = name.to_str() {
+                    if name_str.ends_with(".meta") {
+                        let data = fs::read(&path).await.map_err(FecError::Io)?;
+                        if let Ok(metadata) = bincode::deserialize::<FileMetadata>(&data) {
+                            metadata_list.push(metadata);
+                        }
+                    }
                 }
             }
         }
@@ -523,12 +525,12 @@ impl StorageBackend for LocalStorage {
         for meta in &metadata {
             for chunk in &meta.chunks {
                 for shard_id in &chunk.shard_ids {
-                    if let Ok(cid_bytes) = hex::decode(shard_id)
-                        && cid_bytes.len() == 32
-                    {
-                        let mut cid_array = [0u8; 32];
-                        cid_array.copy_from_slice(&cid_bytes);
-                        referenced_cids.insert(Cid::new(cid_array));
+                    if let Ok(cid_bytes) = hex::decode(shard_id) {
+                        if cid_bytes.len() == 32 {
+                            let mut cid_array = [0u8; 32];
+                            cid_array.copy_from_slice(&cid_bytes);
+                            referenced_cids.insert(Cid::new(cid_array));
+                        }
                     }
                 }
             }
@@ -561,12 +563,12 @@ impl StorageBackend for LocalStorage {
         for meta in &metadata {
             for chunk in &meta.chunks {
                 for shard_id in &chunk.shard_ids {
-                    if let Ok(cid_bytes) = hex::decode(shard_id)
-                        && cid_bytes.len() == 32
-                    {
-                        let mut cid_array = [0u8; 32];
-                        cid_array.copy_from_slice(&cid_bytes);
-                        referenced_cids.insert(Cid::new(cid_array));
+                    if let Ok(cid_bytes) = hex::decode(shard_id) {
+                        if cid_bytes.len() == 32 {
+                            let mut cid_array = [0u8; 32];
+                            cid_array.copy_from_slice(&cid_bytes);
+                            referenced_cids.insert(Cid::new(cid_array));
+                        }
                     }
                 }
             }
@@ -574,13 +576,13 @@ impl StorageBackend for LocalStorage {
 
         // Delete unreferenced shards
         for cid in shards {
-            if !referenced_cids.contains(&cid)
-                && let Ok(shard) = self.get_shard(&cid).await
-            {
-                let shard_size = shard.data.len() as u64 + ShardHeader::SIZE as u64;
-                if self.delete_shard(&cid).await.is_ok() {
-                    shards_deleted += 1;
-                    bytes_freed += shard_size;
+            if !referenced_cids.contains(&cid) {
+                if let Ok(shard) = self.get_shard(&cid).await {
+                    let shard_size = shard.data.len() as u64 + ShardHeader::SIZE as u64;
+                    if self.delete_shard(&cid).await.is_ok() {
+                        shards_deleted += 1;
+                        bytes_freed += shard_size;
+                    }
                 }
             }
         }
@@ -707,12 +709,12 @@ impl StorageBackend for MemoryStorage {
         for meta in metadata.values() {
             for chunk in &meta.chunks {
                 for shard_id in &chunk.shard_ids {
-                    if let Ok(cid_bytes) = hex::decode(shard_id)
-                        && cid_bytes.len() == 32
-                    {
-                        let mut cid_array = [0u8; 32];
-                        cid_array.copy_from_slice(&cid_bytes);
-                        referenced_cids.insert(Cid::new(cid_array));
+                    if let Ok(cid_bytes) = hex::decode(shard_id) {
+                        if cid_bytes.len() == 32 {
+                            let mut cid_array = [0u8; 32];
+                            cid_array.copy_from_slice(&cid_bytes);
+                            referenced_cids.insert(Cid::new(cid_array));
+                        }
                     }
                 }
             }
@@ -745,12 +747,12 @@ impl StorageBackend for MemoryStorage {
         for meta in metadata.values() {
             for chunk in &meta.chunks {
                 for shard_id in &chunk.shard_ids {
-                    if let Ok(cid_bytes) = hex::decode(shard_id)
-                        && cid_bytes.len() == 32
-                    {
-                        let mut cid_array = [0u8; 32];
-                        cid_array.copy_from_slice(&cid_bytes);
-                        referenced_cids.insert(Cid::new(cid_array));
+                    if let Ok(cid_bytes) = hex::decode(shard_id) {
+                        if cid_bytes.len() == 32 {
+                            let mut cid_array = [0u8; 32];
+                            cid_array.copy_from_slice(&cid_bytes);
+                            referenced_cids.insert(Cid::new(cid_array));
+                        }
                     }
                 }
             }

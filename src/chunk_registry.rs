@@ -51,10 +51,10 @@ impl ChunkRegistry {
             self.increment_ref(&chunk_ref.chunk_id)?;
 
             // Update size if not already recorded
-            if let Some(metadata) = self.chunks.get_mut(&chunk_ref.chunk_id)
-                && metadata.size == 0
-            {
-                metadata.size = chunk_ref.size;
+            if let Some(metadata) = self.chunks.get_mut(&chunk_ref.chunk_id) {
+                if metadata.size == 0 {
+                    metadata.size = chunk_ref.size;
+                }
             }
         }
         Ok(())

@@ -226,14 +226,14 @@ impl VersionManager {
     pub fn get_history(&self, file_id: &[u8; 32]) -> Vec<VersionNode> {
         let mut history = Vec::new();
 
-        if let Some(latest_hash) = self.file_versions.get(file_id)
-            && let Some(mut node) = self.versions.get(latest_hash).cloned()
-        {
-            history.push(node.clone());
+        if let Some(latest_hash) = self.file_versions.get(file_id) {
+            if let Some(mut node) = self.versions.get(latest_hash).cloned() {
+                history.push(node.clone());
 
-            while let Some(parent) = node.parent {
-                history.push(parent.as_ref().clone());
-                node = parent.as_ref().clone();
+                while let Some(parent) = node.parent {
+                    history.push(parent.as_ref().clone());
+                    node = parent.as_ref().clone();
+                }
             }
         }
 
