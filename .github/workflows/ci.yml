@@ -55,6 +55,7 @@ jobs:
     
     - name: Check for forbidden patterns
       if: matrix.rust-version == 'stable' && matrix.os == 'ubuntu-latest'
+      shell: bash
       run: |
         echo "Checking for forbidden patterns in production code..."
         EXIT_CODE=0
@@ -94,6 +95,7 @@ jobs:
         exit $EXIT_CODE
     
     - name: Clippy linting
+      shell: bash
       run: |
         if [ "${{ matrix.features }}" = "" ]; then
           cargo clippy --all-targets -- -D warnings -D clippy::correctness -D clippy::suspicious -D clippy::complexity -W clippy::perf -W clippy::style
@@ -102,6 +104,7 @@ jobs:
         fi
     
     - name: Build with features
+      shell: bash
       run: |
         if [ "${{ matrix.features }}" = "" ]; then
           cargo build --verbose
@@ -110,6 +113,7 @@ jobs:
         fi
     
     - name: Run unit tests
+      shell: bash
       run: |
         if [ "${{ matrix.features }}" = "" ]; then
           cargo test --lib --verbose
@@ -118,6 +122,7 @@ jobs:
         fi
     
     - name: Run integration tests
+      shell: bash
       run: |
         if [ "${{ matrix.features }}" = "" ]; then
           cargo test --test '*' --verbose
@@ -126,6 +131,7 @@ jobs:
         fi
     
     - name: Run doctests
+      shell: bash
       run: |
         if [ "${{ matrix.features }}" = "" ]; then
           cargo test --doc
