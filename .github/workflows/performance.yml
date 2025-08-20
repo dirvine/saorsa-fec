@@ -52,7 +52,7 @@ jobs:
     - name: Run benchmarks
       run: |
         # Run benchmarks
-        cargo bench --features ${{ matrix.features }} --bench encoding_benchmark
+        cargo bench --features ${{ matrix.features }} --bench fec_benchmarks
         
         # For now, create a simple valid benchmark results JSON
         # Criterion doesn't directly output the format needed by benchmark-action
@@ -175,7 +175,7 @@ jobs:
         cargo test --release --features pure-rust property_tests -- --test-threads=1
         
         # Run performance test example for stress testing
-        timeout 900 cargo run --release --example performance_test --features pure-rust || true
+        timeout 900 cargo run --release --example basic_usage --features pure-rust || true
 
     - name: Monitor resource usage
       run: |
@@ -310,7 +310,7 @@ jobs:
     - name: Run performance tests
       run: |
         echo "Running performance test on ${{ matrix.os }}..."
-        cargo run --release --example performance_test --features pure-rust
+        cargo run --release --example basic_usage --features pure-rust
 
     - name: System information
       shell: bash
