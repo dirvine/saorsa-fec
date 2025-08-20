@@ -1,0 +1,57 @@
+# Valgrind suppressions for saorsa-fec
+# Suppress known false positives and expected behavior
+
+# Rust runtime allocator suppressions
+{
+   rust-alloc-still-reachable
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:*alloc*
+   ...
+   fun:main
+}
+
+# Thread-related suppressions
+{
+   pthread-leak
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:_dl_allocate_tls
+   fun:pthread_create*
+}
+
+# Standard library suppressions
+{
+   std-once-call
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   ...
+   fun:std::sync::once::*
+}
+
+# System library suppressions
+{
+   libc-leak
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   obj:/lib*/libc-*.so
+}
+
+{
+   glibc-leak
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   obj:/lib*/ld-*.so
+}
+
+# Crypto library suppressions (for saorsa-pqc and HPKE)
+{
+   crypto-init
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:*alloc*
+   ...
+   fun:*init*
+}
