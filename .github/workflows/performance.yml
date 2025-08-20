@@ -54,6 +54,9 @@ jobs:
         # Run benchmarks
         cargo bench --features ${{ matrix.features }} --bench fec_benchmarks
         
+    - name: Create benchmark results JSON
+      shell: bash
+      run: |
         # For now, create a simple valid benchmark results JSON
         # Criterion doesn't directly output the format needed by benchmark-action
         cat > benchmark-results.json << 'BENCHJSON'
@@ -134,7 +137,7 @@ jobs:
         # Run a simple test under Valgrind to check for memory leaks
         valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes \
           --error-exitcode=1 --suppressions=.valgrind.supp \
-          cargo test --features pure-rust --lib memory 2>&1 | tee valgrind.log || true
+          cargo test --features pure-rust --lib test_memory_storage 2>&1 | tee valgrind.log || true
         
         # Check if there were any definite leaks
         if grep -q "definitely lost" valgrind.log; then
