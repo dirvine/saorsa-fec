@@ -85,7 +85,6 @@ fn bench_decode(c: &mut Criterion) {
                     if let Err(e) = backend.decode_blocks(black_box(&mut test_shares), black_box(params)) {
                         if e.to_string().contains("Reed-Solomon reconstruction with missing data shards is not supported") {
                             // Skip this benchmark iteration for unsupported operations
-                            return;
                         } else {
                             panic!("Unexpected decode error: {}", e);
                         }
