@@ -85,28 +85,15 @@ jobs:
         echo "Checking for forbidden patterns in production code..."
         EXIT_CODE=0
 
-        # Use ripgrep to search for patterns, excluding test code more precisely
-        # This approach uses rg's ability to respect #[cfg(test)] boundaries
+        # Use ripgrep to find all matches with context, then filter out test code
+        # This approach is more reliable than complex shell scripts
 
         # Check for unwrap() in production code (tests are OK)
         if rg -n "\.unwrap\(\)" src/ --type rust | head -1; then
           echo "::error::Found .unwrap() in production code:"
-          # Filter out lines that are in test functions or modules
           rg -n "\.unwrap\(\)" src/ --type rust | while IFS=: read -r file line content; do
-            # Check if this line is within a test function or module by looking at preceding lines
-            if ! awk "NR <= $line { lines = \$0 RS lines } END {
-              split(lines, arr, RS)
-              for (i = length(arr); i > 0; i--) {
-                if (arr[i] ~ /#\[test\]|#\[tokio::test\]|#\[cfg\(test\)\]/) {
-                  found = 1
-                  exit
-                }
-                if (arr[i] ~ /^fn / || arr[i] ~ /^mod / || arr[i] ~ /^impl /) {
-                  break
-                }
-              }
-              exit !found
-            }" "$file"; then
+            # Check if this line is within a test function by looking at context
+            if ! sed -n "$((line-10)),$((line+2))p" "$file" | grep -q -E "(#\[test\]|#\[tokio::test\]|#\[cfg\(test\)\]|fn test_)"; then
               echo "::error file=$file,line=$line::$content"
               EXIT_CODE=1
             fi
@@ -117,19 +104,7 @@ jobs:
         if rg -n "\.expect\(" src/ --type rust | head -1; then
           echo "::error::Found .expect() in production code:"
           rg -n "\.expect\(" src/ --type rust | while IFS=: read -r file line content; do
-            if ! awk "NR <= $line { lines = \$0 RS lines } END {
-              split(lines, arr, RS)
-              for (i = length(arr); i > 0; i--) {
-                if (arr[i] ~ /#\[test\]|#\[tokio::test\]|#\[cfg\(test\)\]/) {
-                  found = 1
-                  exit
-                }
-                if (arr[i] ~ /^fn / || arr[i] ~ /^mod / || arr[i] ~ /^impl /) {
-                  break
-                }
-              }
-              exit !found
-            }" "$file"; then
+            if ! sed -n "$((line-10)),$((line+2))p" "$file" | grep -q -E "(#\[test\]|#\[tokio::test\]|#\[cfg\(test\)\]|fn test_)"; then
               echo "::error file=$file,line=$line::$content"
               EXIT_CODE=1
             fi
@@ -140,19 +115,7 @@ jobs:
         if rg -n "panic!" src/ --type rust | head -1; then
           echo "::error::Found panic! in production code:"
           rg -n "panic!" src/ --type rust | while IFS=: read -r file line content; do
-            if ! awk "NR <= $line { lines = \$0 RS lines } END {
-              split(lines, arr, RS)
-              for (i = length(arr); i > 0; i--) {
-                if (arr[i] ~ /#\[test\]|#\[tokio::test\]|#\[cfg\(test\)\]/) {
-                  found = 1
-                  exit
-                }
-                if (arr[i] ~ /^fn / || arr[i] ~ /^mod / || arr[i] ~ /^impl /) {
-                  break
-                }
-              }
-              exit !found
-            }" "$file"; then
+            if ! sed -n "$((line-10)),$((line+2))p" "$file" | grep -q -E "(#\[test\]|#\[tokio::test\]|#\[cfg\(test\)\]|fn test_)"; then
               echo "::error file=$file,line=$line::$content"
               EXIT_CODE=1
             fi
