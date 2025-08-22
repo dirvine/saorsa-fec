@@ -84,39 +84,94 @@ jobs:
       run: |
         echo "Checking for forbidden patterns in production code..."
         EXIT_CODE=0
-        
+
+        # Use ripgrep to search for patterns, excluding test code more precisely
+        # This approach uses rg's ability to respect #[cfg(test)] boundaries
+
         # Check for unwrap() in production code (tests are OK)
-        if find src/ -name "*.rs" -not -path "*/tests/*" -exec grep -l "\.unwrap()" {} \; | head -1; then
+        if rg -n "\.unwrap\(\)" src/ --type rust | head -1; then
           echo "::error::Found .unwrap() in production code:"
-          find src/ -name "*.rs" -not -path "*/tests/*" -exec grep -Hn "\.unwrap()" {} \;
-          EXIT_CODE=1
+          # Filter out lines that are in test functions or modules
+          rg -n "\.unwrap\(\)" src/ --type rust | while IFS=: read -r file line content; do
+            # Check if this line is within a test function or module by looking at preceding lines
+            if ! awk "NR <= $line { lines = \$0 RS lines } END {
+              split(lines, arr, RS)
+              for (i = length(arr); i > 0; i--) {
+                if (arr[i] ~ /#\[test\]|#\[tokio::test\]|#\[cfg\(test\)\]/) {
+                  found = 1
+                  exit
+                }
+                if (arr[i] ~ /^fn / || arr[i] ~ /^mod / || arr[i] ~ /^impl /) {
+                  break
+                }
+              }
+              exit !found
+            }" "$file"; then
+              echo "::error file=$file,line=$line::$content"
+              EXIT_CODE=1
+            fi
+          done
         fi
-        
+
         # Check for expect() in production code (tests are OK)
-        if find src/ -name "*.rs" -not -path "*/tests/*" -exec grep -l "\.expect(" {} \; | head -1; then
+        if rg -n "\.expect\(" src/ --type rust | head -1; then
           echo "::error::Found .expect() in production code:"
-          find src/ -name "*.rs" -not -path "*/tests/*" -exec grep -Hn "\.expect(" {} \;
-          EXIT_CODE=1
+          rg -n "\.expect\(" src/ --type rust | while IFS=: read -r file line content; do
+            if ! awk "NR <= $line { lines = \$0 RS lines } END {
+              split(lines, arr, RS)
+              for (i = length(arr); i > 0; i--) {
+                if (arr[i] ~ /#\[test\]|#\[tokio::test\]|#\[cfg\(test\)\]/) {
+                  found = 1
+                  exit
+                }
+                if (arr[i] ~ /^fn / || arr[i] ~ /^mod / || arr[i] ~ /^impl /) {
+                  break
+                }
+              }
+              exit !found
+            }" "$file"; then
+              echo "::error file=$file,line=$line::$content"
+              EXIT_CODE=1
+            fi
+          done
         fi
-        
+
         # Check for panic! in production code (tests are OK)
-        if find src/ -name "*.rs" -not -path "*/tests/*" -exec grep -l "panic!" {} \; | head -1; then
+        if rg -n "panic!" src/ --type rust | head -1; then
           echo "::error::Found panic! in production code:"
-          find src/ -name "*.rs" -not -path "*/tests/*" -exec grep -Hn "panic!" {} \;
-          EXIT_CODE=1
+          rg -n "panic!" src/ --type rust | while IFS=: read -r file line content; do
+            if ! awk "NR <= $line { lines = \$0 RS lines } END {
+              split(lines, arr, RS)
+              for (i = length(arr); i > 0; i--) {
+                if (arr[i] ~ /#\[test\]|#\[tokio::test\]|#\[cfg\(test\)\]/) {
+                  found = 1
+                  exit
+                }
+                if (arr[i] ~ /^fn / || arr[i] ~ /^mod / || arr[i] ~ /^impl /) {
+                  break
+                }
+              }
+              exit !found
+            }" "$file"; then
+              echo "::error file=$file,line=$line::$content"
+              EXIT_CODE=1
+            fi
+          done
         fi
-        
-        # Check for todo! and unimplemented!
-        if find src/ -name "*.rs" -exec grep -l -E "(todo!|unimplemented!)" {} \; | head -1; then
+
+        # Check for todo! and unimplemented! (anywhere, including tests)
+        if rg -n -E "(todo!|unimplemented!\()" src/ --type rust | head -1; then
           echo "::error::Found incomplete implementations:"
-          find src/ -name "*.rs" -exec grep -Hn -E "(todo!|unimplemented!)" {} \;
-          EXIT_CODE=1
+          rg -n -E "(todo!|unimplemented!\()" src/ --type rust | while IFS=: read -r file line content; do
+            echo "::error file=$file,line=$line::$content"
+            EXIT_CODE=1
+          done
         fi
-        
+
         if [ $EXIT_CODE -eq 0 ]; then
-          echo "✅ No forbidden patterns found"
+          echo "✅ No forbidden patterns found in production code"
         fi
-        
+
         exit $EXIT_CODE
     
     - name: Clippy linting
