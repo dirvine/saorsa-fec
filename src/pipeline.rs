@@ -360,7 +360,7 @@ impl<B: StorageBackend> StoragePipeline<B> {
                 } else {
                     None
                 };
-                Ok(derive_convergent_key(original_data, secret.as_ref()))
+                derive_convergent_key(original_data, secret.as_ref())
             }
             crate::crypto::KeyDerivation::Random => {
                 anyhow::bail!("Random keys cannot be reconstructed without external storage")
@@ -493,13 +493,13 @@ impl Pipeline {
         // Encrypt based on mode
         let (encrypted_data, _key) = match self.config.encryption.mode {
             EncryptionMode::Convergent => {
-                let key = derive_convergent_key(&processed_data, None);
+                let key = derive_convergent_key(&processed_data, None)?;
                 let encrypted = self.encryption.encrypt(&processed_data, &key)?;
                 (encrypted, key)
             }
             EncryptionMode::ConvergentWithSecret => {
                 let secret = self.get_user_secret()?;
-                let key = derive_convergent_key(&processed_data, Some(&secret));
+                let key = derive_convergent_key(&processed_data, Some(&secret))?;
                 let encrypted = self.encryption.encrypt(&processed_data, &key)?;
                 (encrypted, key)
             }

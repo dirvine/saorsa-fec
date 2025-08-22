@@ -617,18 +617,31 @@ impl MemoryStorage {
 
     /// Clear all stored data
     pub fn clear(&self) {
-        self.shards.write().unwrap().clear();
-        self.metadata.write().unwrap().clear();
+        // Handle poisoned locks by recovering the data
+        match self.shards.write() {
+            Ok(mut guard) => guard.clear(),
+            Err(poisoned) => poisoned.into_inner().clear(),
+        }
+        match self.metadata.write() {
+            Ok(mut guard) => guard.clear(),
+            Err(poisoned) => poisoned.into_inner().clear(),
+        }
     }
 
     /// Get the number of stored shards
     pub fn shard_count(&self) -> usize {
-        self.shards.read().unwrap().len()
+        match self.shards.read() {
+            Ok(guard) => guard.len(),
+            Err(poisoned) => poisoned.into_inner().len(),
+        }
     }
 
     /// Get the number of stored metadata entries
     pub fn metadata_count(&self) -> usize {
-        self.metadata.read().unwrap().len()
+        match self.metadata.read() {
+            Ok(guard) => guard.len(),
+            Err(poisoned) => poisoned.into_inner().len(),
+        }
     }
 }
 
@@ -641,44 +654,65 @@ impl Default for MemoryStorage {
 #[async_trait]
 impl StorageBackend for MemoryStorage {
     async fn put_shard(&self, cid: &Cid, shard: &Shard) -> Result<(), FecError> {
-        self.shards.write().unwrap().insert(*cid, shard.clone());
+        let mut shards = match self.shards.write() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        shards.insert(*cid, shard.clone());
         Ok(())
     }
 
     async fn get_shard(&self, cid: &Cid) -> Result<Shard, FecError> {
-        self.shards
-            .read()
-            .unwrap()
+        let shards = match self.shards.read() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        shards
             .get(cid)
             .cloned()
             .ok_or_else(|| FecError::Backend(format!("Shard not found: {}", cid.to_hex())))
     }
 
     async fn delete_shard(&self, cid: &Cid) -> Result<(), FecError> {
-        self.shards.write().unwrap().remove(cid);
+        let mut shards = match self.shards.write() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        shards.remove(cid);
         Ok(())
     }
 
     async fn has_shard(&self, cid: &Cid) -> Result<bool, FecError> {
-        Ok(self.shards.read().unwrap().contains_key(cid))
+        let shards = match self.shards.read() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        Ok(shards.contains_key(cid))
     }
 
     async fn list_shards(&self) -> Result<Vec<Cid>, FecError> {
-        Ok(self.shards.read().unwrap().keys().copied().collect())
+        let shards = match self.shards.read() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        Ok(shards.keys().copied().collect())
     }
 
     async fn put_metadata(&self, metadata: &FileMetadata) -> Result<(), FecError> {
-        self.metadata
-            .write()
-            .unwrap()
-            .insert(metadata.file_id, metadata.clone());
+        let mut metadata_store = match self.metadata.write() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        metadata_store.insert(metadata.file_id, metadata.clone());
         Ok(())
     }
 
     async fn get_metadata(&self, file_id: &[u8; 32]) -> Result<FileMetadata, FecError> {
-        self.metadata
-            .read()
-            .unwrap()
+        let metadata_store = match self.metadata.read() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        metadata_store
             .get(file_id)
             .cloned()
             .ok_or_else(|| {
@@ -687,17 +721,31 @@ impl StorageBackend for MemoryStorage {
     }
 
     async fn delete_metadata(&self, file_id: &[u8; 32]) -> Result<(), FecError> {
-        self.metadata.write().unwrap().remove(file_id);
+        let mut metadata_store = match self.metadata.write() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        metadata_store.remove(file_id);
         Ok(())
     }
 
     async fn list_metadata(&self) -> Result<Vec<FileMetadata>, FecError> {
-        Ok(self.metadata.read().unwrap().values().cloned().collect())
+        let metadata_store = match self.metadata.read() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        Ok(metadata_store.values().cloned().collect())
     }
 
     async fn stats(&self) -> Result<StorageStats, FecError> {
-        let shards = self.shards.read().unwrap();
-        let metadata = self.metadata.read().unwrap();
+        let shards = match self.shards.read() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
+        let metadata = match self.metadata.read() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
 
         let total_size: u64 = shards
             .values()
@@ -739,8 +787,14 @@ impl StorageBackend for MemoryStorage {
         let mut bytes_freed = 0u64;
 
         // Get snapshot of current state
-        let shards = self.shards.read().unwrap().clone();
-        let metadata = self.metadata.read().unwrap().clone();
+        let shards = match self.shards.read() {
+            Ok(guard) => guard.clone(),
+            Err(poisoned) => poisoned.into_inner().clone(),
+        };
+        let metadata = match self.metadata.read() {
+            Ok(guard) => guard.clone(),
+            Err(poisoned) => poisoned.into_inner().clone(),
+        };
 
         // Build set of referenced shards
         let mut referenced_cids = std::collections::HashSet::new();
@@ -759,7 +813,10 @@ impl StorageBackend for MemoryStorage {
         }
 
         // Delete unreferenced shards
-        let mut shards_write = self.shards.write().unwrap();
+        let mut shards_write = match self.shards.write() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        };
         for (cid, shard) in shards {
             if !referenced_cids.contains(&cid) {
                 let shard_size = shard.data.len() as u64 + ShardHeader::SIZE as u64;

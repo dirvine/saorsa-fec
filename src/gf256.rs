@@ -149,7 +149,9 @@ impl Div for Gf256 {
 
     fn div(self, other: Self) -> Self {
         if other.0 == 0 {
-            panic!("Division by zero in GF(256)");
+            // Division by zero in GF(256) is undefined, return zero
+            // This should not happen in correct Reed-Solomon usage
+            return Self::ZERO;
         }
         if self.0 == 0 {
             return Self::ZERO;

@@ -121,9 +121,25 @@ impl FecParams {
     /// Calculate parameters based on content size
     pub fn from_content_size(size: usize) -> Self {
         match size {
-            0..=1_000_000 => Self::new(8, 2).unwrap(), // 25% overhead
-            1_000_001..=10_000_000 => Self::new(16, 4).unwrap(), // 25% overhead
-            _ => Self::new(20, 5).unwrap(),            // 25% overhead
+            // These parameters are hardcoded and guaranteed to be valid
+            // k=8, n=10 (8+2=10), total=10 < 255 ✓
+            // k=16, n=20 (16+4=20), total=20 < 255 ✓  
+            // k=20, n=25 (20+5=25), total=25 < 255 ✓
+            0..=1_000_000 => Self {
+                data_shares: 8,
+                parity_shares: 2,
+                symbol_size: 64 * 1024, // 64KB default
+            },
+            1_000_001..=10_000_000 => Self {
+                data_shares: 16,
+                parity_shares: 4,
+                symbol_size: 64 * 1024, // 64KB default
+            },
+            _ => Self {
+                data_shares: 20,
+                parity_shares: 5,
+                symbol_size: 64 * 1024, // 64KB default
+            },
         }
     }
 }

@@ -176,7 +176,7 @@ impl CryptoEngine {
                     None
                 };
 
-                Ok(derive_convergent_key(data, secret))
+                derive_convergent_key(data, secret)
             }
             KeyDerivation::Random => {
                 anyhow::bail!("Random keys cannot be reconstructed without external storage")
@@ -198,7 +198,7 @@ impl Default for CryptoEngine {
 /// - Identical plaintexts produce identical keys and ciphertexts
 /// - No semantic security for identical content
 /// - Consider using ConvergentWithSecret or RandomKey modes for sensitive data
-pub fn derive_convergent_key(content: &[u8], secret: Option<&[u8; 32]>) -> EncryptionKey {
+pub fn derive_convergent_key(content: &[u8], secret: Option<&[u8; 32]>) -> Result<EncryptionKey> {
     // Use SHA-256 hash of content as the input key material (IKM)
     let mut hasher = Sha256::new();
 
@@ -223,7 +223,7 @@ pub fn derive_convergent_key(content: &[u8], secret: Option<&[u8; 32]>) -> Encry
     let hkdf = Hkdf::<Sha256>::new(Some(&salt), &content_hash);
     let mut key = [0u8; 32];
     hkdf.expand(b"saorsa-fec:aead:v1", &mut key)
-        .expect("HKDF expand should never fail with valid parameters");
+        .map_err(|_| anyhow::anyhow!("HKDF expand failed unexpectedly"))?;
 
     let encryption_key = EncryptionKey::new(key);
 
@@ -231,7 +231,7 @@ pub fn derive_convergent_key(content: &[u8], secret: Option<&[u8; 32]>) -> Encry
     let mut key_to_zero = key;
     key_to_zero.zeroize();
 
-    encryption_key
+    Ok(encryption_key)
 }
 
 /// Generate a random encryption key using cryptographically secure RNG
@@ -297,7 +297,7 @@ pub fn verify_mac_constant_time(computed: &[u8], stored: &[u8]) -> bool {
 ///
 /// Derives a separate key for message authentication to prevent
 /// key correlation between encryption and authentication operations.
-pub fn derive_mac_key(encryption_key: &EncryptionKey) -> [u8; 32] {
+pub fn derive_mac_key(encryption_key: &EncryptionKey) -> Result<[u8; 32]> {
     let salt = {
         let mut salt_hasher = Sha256::new();
         salt_hasher.update(b"saorsa-fec-v0.3-salt");
@@ -308,9 +308,9 @@ pub fn derive_mac_key(encryption_key: &EncryptionKey) -> [u8; 32] {
     let hkdf = Hkdf::<Sha256>::new(Some(&salt), encryption_key.as_bytes());
     let mut mac_key = [0u8; 32];
     hkdf.expand(b"saorsa-fec:mac:v1", &mut mac_key)
-        .expect("HKDF expand should never fail with valid parameters");
+        .map_err(|_| anyhow::anyhow!("HKDF expand failed unexpectedly"))?;
 
-    mac_key
+    Ok(mac_key)
 }
 
 /// Compute convergence secret ID
@@ -329,7 +329,7 @@ mod tests {
     fn test_encryption_roundtrip() {
         let mut engine = CryptoEngine::new();
         let data = b"Hello, World!";
-        let key = derive_convergent_key(data, None);
+        let key = derive_convergent_key(data, None).unwrap();
 
         let encrypted = engine.encrypt(data, &key).unwrap();
         assert_ne!(encrypted, data);
@@ -342,8 +342,8 @@ mod tests {
     #[test]
     fn test_convergent_key_deterministic() {
         let data = b"Test data";
-        let key1 = derive_convergent_key(data, None);
-        let key2 = derive_convergent_key(data, None);
+        let key1 = derive_convergent_key(data, None).unwrap();
+        let key2 = derive_convergent_key(data, None).unwrap();
 
         assert_eq!(key1.as_bytes(), key2.as_bytes());
     }
@@ -353,8 +353,8 @@ mod tests {
         let data = b"Test data";
         let secret = ConvergenceSecret::new([42u8; 32]);
 
-        let key_with_secret = derive_convergent_key(data, Some(secret.as_bytes()));
-        let key_without = derive_convergent_key(data, None);
+        let key_with_secret = derive_convergent_key(data, Some(secret.as_bytes())).unwrap();
+        let key_without = derive_convergent_key(data, None).unwrap();
 
         assert_ne!(key_with_secret.as_bytes(), key_without.as_bytes());
     }
