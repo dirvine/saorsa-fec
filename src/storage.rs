@@ -4,8 +4,8 @@
 //! (local filesystem, memory, network, multi-backend) that work with
 //! the v0.3 shard format with 96-byte headers and CID-based addressing.
 
-use crate::FecError;
 use crate::config::EncryptionMode;
+use crate::FecError;
 use anyhow::Result;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};

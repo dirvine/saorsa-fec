@@ -1,7 +1,7 @@
 //! Integration test for v0.3 API specification compliance
 
 use anyhow::Result;
-use saorsa_fec::{Config, EncryptionMode, Meta, StoragePipeline, storage::LocalStorage};
+use saorsa_fec::{storage::LocalStorage, Config, EncryptionMode, Meta, StoragePipeline};
 use tempfile::TempDir;
 
 #[tokio::test]

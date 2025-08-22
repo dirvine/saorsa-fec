@@ -3,8 +3,8 @@
 
 //! Performance benchmarks for FEC operations
 
-use criterion::{BenchmarkId, Criterion, Throughput, black_box, criterion_group, criterion_main};
-use saorsa_fec::{FecBackend, FecParams, backends::pure_rust::PureRustBackend};
+use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
+use saorsa_fec::{backends::pure_rust::PureRustBackend, FecBackend, FecParams};
 
 fn bench_encode(c: &mut Criterion) {
     let mut group = c.benchmark_group("encode");
@@ -82,8 +82,12 @@ fn bench_decode(c: &mut Criterion) {
                 b.iter(|| {
                     let mut test_shares = shares.clone();
                     // Skip reconstruction tests for reed-solomon-simd v3 which doesn't support missing data shards
-                    if let Err(e) = backend.decode_blocks(black_box(&mut test_shares), black_box(params)) {
-                        if e.to_string().contains("Reed-Solomon reconstruction with missing data shards is not supported") {
+                    if let Err(e) =
+                        backend.decode_blocks(black_box(&mut test_shares), black_box(params))
+                    {
+                        if e.to_string().contains(
+                            "Reed-Solomon reconstruction with missing data shards is not supported",
+                        ) {
                             // Skip this benchmark iteration for unsupported operations
                         } else {
                             panic!("Unexpected decode error: {}", e);

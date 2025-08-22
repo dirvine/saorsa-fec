@@ -4,7 +4,7 @@
 //! Property-based tests for FEC implementation
 
 use proptest::prelude::*;
-use saorsa_fec::{FecBackend, FecParams, backends::pure_rust::PureRustBackend};
+use saorsa_fec::{backends::pure_rust::PureRustBackend, FecBackend, FecParams};
 use std::collections::HashSet;
 
 /// Generate valid FEC parameters

@@ -6,7 +6,7 @@
 //! This example demonstrates the high-performance reed-solomon-simd backend
 //! which achieves 1,000-7,500 MB/s throughput with SIMD acceleration.
 
-use saorsa_fec::{FecBackend, FecParams, backends::pure_rust::PureRustBackend};
+use saorsa_fec::{backends::pure_rust::PureRustBackend, FecBackend, FecParams};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Create a simple example with 4 data blocks and 2 parity blocks
@@ -48,7 +48,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             // Successful reconstruction
         }
         Err(e) => {
-            if e.to_string().contains("Reed-Solomon reconstruction with missing data shards is not supported") {
+            if e.to_string()
+                .contains("Reed-Solomon reconstruction with missing data shards is not supported")
+            {
                 println!("Note: This reed-solomon-simd version doesn't support reconstruction with missing data shards");
                 println!("The example demonstrates encoding functionality which works correctly");
                 return Ok(());

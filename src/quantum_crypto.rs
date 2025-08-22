@@ -10,7 +10,7 @@ use generic_array::GenericArray;
 use hkdf::Hkdf;
 use saorsa_pqc::api::{
     kem::ml_kem_768,
-    symmetric::{ChaCha20Poly1305, generate_nonce},
+    symmetric::{generate_nonce, ChaCha20Poly1305},
 };
 use serde::{Deserialize, Serialize};
 use sha2::Sha256;

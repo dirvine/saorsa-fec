@@ -11,7 +11,7 @@ use std::sync::Arc;
 use crate::chunk_registry::{ChunkInfo, ChunkRegistry};
 use crate::config::{Config, EncryptionMode};
 use crate::crypto::{
-    CryptoEngine, EncryptionKey, EncryptionMetadata, derive_convergent_key, generate_random_key,
+    derive_convergent_key, generate_random_key, CryptoEngine, EncryptionKey, EncryptionMetadata,
 };
 use crate::gc::GarbageCollector;
 use crate::ida::IDAConfig;
@@ -376,8 +376,8 @@ impl<B: StorageBackend> StoragePipeline<B> {
 
     /// Compress data
     fn compress(&self, data: &[u8]) -> Result<Vec<u8>> {
-        use flate2::Compression;
         use flate2::write::GzEncoder;
+        use flate2::Compression;
         use std::io::Write;
 
         let level = Compression::new(self.config.compression_level as u32);
@@ -650,8 +650,8 @@ impl Pipeline {
 
     /// Compress data
     fn compress(&self, data: &[u8]) -> Result<Vec<u8>> {
-        use flate2::Compression;
         use flate2::write::GzEncoder;
+        use flate2::Compression;
         use std::io::Write;
 
         let level = Compression::new(self.config.encryption.compression_level);

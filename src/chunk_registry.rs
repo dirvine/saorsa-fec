@@ -472,12 +472,10 @@ mod tests {
 
         assert_eq!(imported.get_ref_count(&[1u8; 32]), Some(1));
         assert_eq!(imported.get_ref_count(&[2u8; 32]), Some(1));
-        assert!(
-            imported
-                .get_versions_using(&[1u8; 32])
-                .unwrap()
-                .contains(&[10u8; 32])
-        );
+        assert!(imported
+            .get_versions_using(&[1u8; 32])
+            .unwrap()
+            .contains(&[10u8; 32]));
     }
 
     #[test]

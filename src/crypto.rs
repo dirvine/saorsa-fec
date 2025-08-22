@@ -6,8 +6,8 @@
 //! - Random key for maximum privacy
 
 use aes_gcm::{
-    Aes256Gcm, Key, Nonce,
     aead::{Aead, AeadCore, KeyInit, OsRng},
+    Aes256Gcm, Key, Nonce,
 };
 use anyhow::{Context, Result};
 // blake3::Hasher removed as we're using SHA-256 for v0.3 spec
