@@ -712,12 +712,9 @@ impl StorageBackend for MemoryStorage {
             Ok(guard) => guard,
             Err(poisoned) => poisoned.into_inner(),
         };
-        metadata_store
-            .get(file_id)
-            .cloned()
-            .ok_or_else(|| {
-                FecError::Backend(format!("Metadata not found: {}", hex::encode(file_id)))
-            })
+        metadata_store.get(file_id).cloned().ok_or_else(|| {
+            FecError::Backend(format!("Metadata not found: {}", hex::encode(file_id)))
+        })
     }
 
     async fn delete_metadata(&self, file_id: &[u8; 32]) -> Result<(), FecError> {

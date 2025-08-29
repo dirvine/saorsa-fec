@@ -26,6 +26,7 @@ pub mod backends;
 pub mod chunk_registry;
 pub mod config;
 pub mod crypto;
+pub mod fec;
 pub mod gc;
 pub mod gf256;
 pub mod ida;
@@ -123,7 +124,7 @@ impl FecParams {
         match size {
             // These parameters are hardcoded and guaranteed to be valid
             // k=8, n=10 (8+2=10), total=10 < 255 ✓
-            // k=16, n=20 (16+4=20), total=20 < 255 ✓  
+            // k=16, n=20 (16+4=20), total=20 < 255 ✓
             // k=20, n=25 (20+5=25), total=25 < 255 ✓
             0..=1_000_000 => Self {
                 data_shares: 8,
